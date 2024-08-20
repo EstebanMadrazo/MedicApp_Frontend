@@ -152,10 +152,10 @@ const CompletedBooking = () => {
                 <View style={styles.detailsRightContainer}>
                   <Text style={[styles.name, {
                     color: COLORS.greyscale900
-                  }]}>{item.info.given_name}</Text>
+                  }]}>{item.appointment.external_patient ? item.appointment.external_patient : item.info.given_name}</Text>
                   <Text style={[styles.name, {
                     color: COLORS.greyscale900
-                  }]}>{item.info.family_name}</Text>
+                  }]}>{item.appointment.external_patient ?  "PACIENTE EXTERNO" : item.info.family_name}</Text>
                   <View style={styles.priceContainer}>
                     <Text style={[styles.address, {
                       color: COLORS.grayscale700,

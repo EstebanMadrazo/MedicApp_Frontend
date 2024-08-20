@@ -8,9 +8,12 @@ import { useRoute } from '@react-navigation/native';
 const MyAppointmentMessaging = ({ navigation }) => {
   const [age, setAge] = useState(0)
   const route = useRoute();
-  const { appointmentInfo } = route.params || {};
+  const { appointmentInfo, externalPatient } = route.params || {};
   
   const getAge = () => {
+    if(externalPatient){
+      return setAge('N/A')
+    }
     const birthdate = new Date(appointmentInfo.info.birthdate)
     birthdate.setMinutes(birthdate.getMinutes() - birthdate.getTimezoneOffset())
     const actualAge = new Date().getFullYear() - birthdate.getFullYear() 
@@ -75,16 +78,16 @@ const MyAppointmentMessaging = ({ navigation }) => {
             <View>
               <Text style={[styles.doctorName, {
                 color: COLORS.greyscale900
-              }]}>{appointmentInfo.info.given_name}</Text>
+              }]}>{externalPatient ? externalPatient : appointmentInfo.info.given_name}</Text>
               <Text style={[styles.doctorName, {
                 color: COLORS.greyscale900
-              }]}>{appointmentInfo.info.family_name}</Text>
+              }]}>{externalPatient ? "" : appointmentInfo.info.family_name}</Text>
               <View style={[styles.separateLine, {
                 backgroundColor: COLORS.grayscale200,
               }]} />
               <Text style={[styles.doctorSpeciality, {
                 color: COLORS.greyScale800
-              }]}>{}</Text>
+              }]}>{externalPatient ? "PACIENTE EXTERNO":""}</Text>
               <Text style={[styles.doctorHospital, {
                 color: COLORS.greyScale800
               }]}>{}</Text>
@@ -124,7 +127,7 @@ const MyAppointmentMessaging = ({ navigation }) => {
           <View>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>:  {appointmentInfo.info.sex}</Text>
+            }]}>:  {externalPatient ? "N/A" : appointmentInfo.info.sex}</Text>
           </View>
         </View>
         <View style={styles.viewContainer}>
@@ -166,17 +169,17 @@ const MyAppointmentMessaging = ({ navigation }) => {
               <View>
                 <Text style={[styles.pkgTitle, {
                   color: COLORS.greyscale900
-                }]}>Presencial</Text>
+                }]}>{externalPatient ? "Cita Externa" : "Cita Presencial"}</Text>
                 <Text style={[styles.pkgDescription, {
                   color: COLORS.greyScale800
-                }]}>Cita presencial con el paciente</Text>
+                }]}>{externalPatient ? "Cita agendada fuera de PREMED" :"Cita presencial con el paciente"}</Text>
               </View>
             </View>
             <View style={styles.pkgRightContainer}>
-              <Text style={styles.pkgPrice}>${appointmentInfo.appointment.total}</Text>
+              <Text style={styles.pkgPrice}>{externalPatient ? "N/A" : `$ ${appointmentInfo.appointment.total}`}</Text>
               <Text style={[styles.pkgPriceTag, {
                 color: COLORS.greyScale800
-              }]}>({appointmentInfo.appointment.is_verified ? "pagado" :"pendiente"})</Text>
+              }]}>({externalPatient ? "N/A" : appointmentInfo.appointment.is_verified ? "pagado" :"pendiente"})</Text>
             </View>
           </View>
         </View>

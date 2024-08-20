@@ -59,7 +59,8 @@ const UpcomingBooking = () => {
 
   return (
     <View style={[styles.container, {
-      backgroundColor: COLORS.tertiaryWhite
+      backgroundColor: COLORS.tertiaryWhite,
+      justifyContent:"center"
     }]}>
       {/*<FlatList
         data={bookings}
@@ -150,7 +151,14 @@ const UpcomingBooking = () => {
         )}
       />*/}
       {appointments.length === 0 ? (
-        <Text style={styles.item}>No appointments available</Text>
+        <View style={[styles.container, {
+          justifyContent:"center",
+          alignItems:"center"
+        }]}>
+          <Text style={{
+            fontSize:25
+          }}>No hay proximas disponibles</Text>
+        </View>
       ) : (
         <FlatList
           data={appointments.reverse()}
@@ -165,7 +173,8 @@ const UpcomingBooking = () => {
                     "MyAppointmentVideocall" :
                     "MyAppointmentMessaging",
                     params: {
-                      appointmentInfo: item // or any other parameter you want to pass
+                      appointmentInfo: item, // or any other parameter you want to pass
+                      externalPatient: item.appointment.external_patient
                     }
                 })}
                 style={styles.detailsViewContainer}>
@@ -187,10 +196,10 @@ const UpcomingBooking = () => {
                   <View style={styles.detailsRightContainer}>
                     <Text style={[styles.name, {
                       color: COLORS.greyscale900
-                    }]}>{item.info.given_name}</Text>
+                    }]}>{item.appointment.external_patient ? item.appointment.external_patient : item.info.given_name}</Text>
                     <Text style={[styles.name, {
                       color: COLORS.greyscale900
-                    }]}>{item.info.family_name}</Text>
+                    }]}>{item.appointment.external_patient ? "PACIENTE EXTERNO" : item.info.family_name}</Text>
                     <View style={styles.priceContainer}>
                       <Text style={[styles.address, {
                         color: COLORS.grayscale700,
@@ -281,7 +290,7 @@ const UpcomingBooking = () => {
           }]}>¿Estás seguro de que deseas cancelar la cita?</Text>
           <Text style={[styles.cancelSubtitle, {
             color: COLORS.grayscale700
-          }]}>El reembolso procederá de acuerdo con nuestras políticas de reembolsos, especificadas en los <Link to={{screen: 'TaC'}} style={{color:COLORS.primary}}>términos y condiciones.</Link></Text>
+          }]}>El reembolso procederá de acuerdo con nuestras políticas de reembolsos, especificadas en los <Link onPress={() => refRBSheet.current.close()} to={{screen: 'TaC'}} style={{color:COLORS.primary}}>términos y condiciones.</Link></Text>
         </View>
 
         <View style={styles.bottomContainer}>
@@ -314,6 +323,7 @@ const UpcomingBooking = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex:1,
     backgroundColor: COLORS.tertiaryWhite,
     marginVertical: 22
   },

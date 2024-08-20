@@ -30,6 +30,7 @@ const BottomTabNavigation = () => {
                 <Tab.Navigator screenOptions={{
                     tabBarShowLabel: false,
                     headerShown: false,
+                    unmountOnBlur:true,
                     tabBarStyle: {
                         position: 'absolute',
                         justifyContent: "center",
@@ -147,6 +148,7 @@ const BottomTabNavigation = () => {
                     <Tab.Navigator screenOptions={{
                         tabBarShowLabel: false,
                         headerShown: false,
+                        unmountOnBlur:true,
                         tabBarStyle: {
                             position: 'absolute',
                             justifyContent: "center",
