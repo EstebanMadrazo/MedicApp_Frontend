@@ -1,16 +1,17 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
 import { COLORS, SIZES, icons } from '../constants';
-import { FontAwesome } from "@expo/vector-icons";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const HorizontalDoctorCard = ({
     name,
     image,
-    //distance,
-    //hospital,
+    main_st,
+    neighborhood,
+    office_state,
     consultationFee,
     rating,
-    //numReviews,
+    //schedule_appointments,
     isAvailable = isAvailable? isAvailable: true,
     onPress
 }) => {
@@ -43,17 +44,17 @@ const HorizontalDoctorCard = ({
                     }]}>{name}</Text>
                 </View>
                 <View style={styles.viewContainer}>
-                    <FontAwesome name="star" size={14} color="rgb(250, 159, 28)" />
+                    <AntDesign name="star" size={14} color="rgb(250, 159, 28)" />
                     <Text style={[styles.location, {
                         color: COLORS.grayscale700,
-                    }]}>{" "}{rating}  {/* ({numReviews}) */}</Text>
-                    {/* <Text style={[styles.location, {
+                    }]}>{" "}{rating}{/* {" "}{schedule_appointments} Citas agendadas */}</Text>
+                    <Text style={[styles.location, {
                         color: COLORS.grayscale700,
-                    }]}>{"  "}|  {distance}</Text> */}
+                    }]}>{"  "}|  {main_st} | {neighborhood}</Text>
                 </View>
-                {/* <Text style={[styles.location, {
+                <Text style={[styles.location, {
                     color: COLORS.grayscale700,
-                }]}>{hospital}</Text> */}
+                }]}>{office_state}</Text>
                 <View style={styles.bottomViewContainer}>
                     <View style={styles.priceContainer}>
                         <Text style={styles.price}>${consultationFee}</Text>

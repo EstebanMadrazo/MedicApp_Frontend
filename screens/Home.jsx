@@ -22,7 +22,7 @@ const Home = ({ navigation }) => {
   const [medics, setMedics] = useState([])
   const [seeAll, setSeeAll] = useState(false)
 
-  //console.log("MEDICS: ", medics)
+  console.log("MEDICS: ", medics)
  
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
@@ -509,12 +509,12 @@ const handleSearch = async (data) => {
                 <HorizontalDoctorCard
                   name={item?.given_name + " " + item?.family_name}
                   image={item?.profile_picture}
-                  //distance={item.distance}
-                  //price={item?.price}
+                  main_st={item.main_st}
+                  neighborhood={item?.neighborhood}
+                  office_state={item.office_state}
                   consultationFee={item?.price}
-                  //hospital={item.hospital}
                   rating={item?.score}
-                  //numReviews={item.numReviews}
+                  //schedule_appointments={item.schedule_appointments}
                   isAvailable={true}
                   onPress={() => navigation.navigate("DoctorDetails")}
                 />
