@@ -8,6 +8,7 @@ import { validateInput } from '../utils/actions/formActions';
 import Input from '../components/Input';
 import Checkbox from 'expo-checkbox';
 import Button from '../components/Button';
+import axios from 'axios';
 
 const isTestMode = true;
 
@@ -23,25 +24,60 @@ const initialState = {
   formIsValid: false,
 }
 
-const CreateNewPassword = ({ navigation }) => {
+const CreateNewPassword = ({ route, navigation }) => {
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const {data} = route.params
+  const [newPassword, setNewPassword] = useState()
+  const [confirmNewPassword, setConfirmNewPassword] = useState()
 
   const inputChangedHandler = useCallback(
     (inputId, inputValue) => {
       const result = validateInput(inputId, inputValue)
       dispatchFormState({ inputId, validationResult: result, inputValue })
+
+      if(inputId === 'newPassword'){
+        setNewPassword(inputValue)
+      }else{
+        setConfirmNewPassword(inputValue)
+      }
     },
     [dispatchFormState]
   )
 
   useEffect(() => {
     if (error) {
-      Alert.alert('An error occured', error)
+      Alert.alert('Error', error)
     }
   }, [error])
+
+  const handlePassword = async() => {
+    if(newPassword != confirmNewPassword){
+      setError("Las contraseñas no son iguales")
+      setTimeout(() => {
+        setError('')
+      }, 4000);
+      return
+    }
+    try{
+      await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/updateRecoverPassword`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        data:{account:data.account, password:newPassword, recoverySecret:`${process.env.EXPO_PUBLIC_RECOVERY_SECRET}`}, 
+      })
+      setModalVisible(true)
+      }catch(e){
+        console.log(e)
+        setError('Oh no, ocurrió un problema. Intentalo más tarde.')
+        setTimeout(() => {
+          setError('')
+        }, 4000);
+      } 
+  };
 
   // Render modal
   const renderModal = () => {
@@ -61,12 +97,12 @@ const CreateNewPassword = ({ navigation }) => {
                 resizeMode='contain'
                 style={styles.modalIllustration}
               />
-              <Text style={styles.modalTitle}>Congratulations!</Text>
+              <Text style={styles.modalTitle}>Felicidades!</Text>
               <Text style={[styles.modalSubtitle, {
                 color: COLORS.greyscale600,
-              }]}>Your account is ready to use. You will be redirected to the Home page in a few seconds..</Text>
+              }]}>Tu cuenta esta lista para usar. En breve podrás volver a ingresar de nuevo..</Text>
               <Button
-                title="Continue"
+                title="Continuar"
                 filled
                 onPress={() => {
                   setModalVisible(false)
@@ -87,7 +123,7 @@ const CreateNewPassword = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Create New Password" />
+        <Header title="Nueva Contraseña" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.logoContainer}>
             <Image
@@ -98,26 +134,28 @@ const CreateNewPassword = ({ navigation }) => {
           </View>
           <Text style={[styles.title, {
             color: COLORS.black
-          }]}>Create Your New Password</Text>
+          }]}>Crea una nueva Contraseña</Text>
           <Input
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities['newPassword']}
             autoCapitalize="none"
             id="newPassword"
-            placeholder="New Password"
+            placeholder="Nueva contraseña"
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
+            value={newPassword}
           />
           <Input
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities['confirmNewPassword']}
             autoCapitalize="none"
             id="confirmNewPassword"
-            placeholder="Confirm New Password"
+            placeholder="Confirma la nueva contraseña"
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
+            value={confirmNewPassword}
           />
           <View style={styles.checkBoxContainer}>
             <View style={{ flexDirection: 'row' }}>
@@ -140,7 +178,7 @@ const CreateNewPassword = ({ navigation }) => {
         <Button
           title="Continue"
           filled
-          onPress={() => setModalVisible(true)}
+          onPress={handlePassword}
           style={styles.button}
         />
         {renderModal()}

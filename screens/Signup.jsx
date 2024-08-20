@@ -19,6 +19,7 @@ import axios from "axios";
 import PatientQ from '../components/questionnaires/PatientQ';
 import MedicQ from '../components/questionnaires/MedicQ';
 import RepQ from '../components/questionnaires/RepQ';
+import { Link } from '@react-navigation/native';
 import {
   Controller,
   useForm,
@@ -60,6 +61,7 @@ const Signup = ({ navigation }) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profTitle, setProfTitle] = useState();
   const [profID, setProfID] = useState();
+  const [uploading, setUploading] = useState(false);
   const {
     handleSubmit,
     control,
@@ -102,7 +104,7 @@ const Signup = ({ navigation }) => {
     }
   };
 
-  /* const handleRegister = async(data) => {
+  const handleRegister = async(data) => {
     setIsRegistered(true)
     if (!isChecked) {
       Alert.alert(
@@ -126,7 +128,7 @@ const Signup = ({ navigation }) => {
       ...rest
     } = data;
 
-    birthDate = data.birthDate.toISOString().split("T")[0];
+    birthDate = data.birthDate.replace(/\//g, '-');
     //user base data
     const userData = {
       state,
@@ -183,15 +185,13 @@ const Signup = ({ navigation }) => {
           })
           if (resp.data.message === 'Patient Created'){
             Alert.alert('Estatus', 'Creaste un nuevo usuario paciente')
-            //router.back()
+            navigation.goBack()
           }
         }catch(e){
-          //@ts-ignore4
           console.log(e.response.data.message)
         }
         setIsRegistered(false)  
         return
-      // @ts-ignore 
     } else if (questionnaire.company) {
       setValue("products", products);
       try{
@@ -203,30 +203,77 @@ const Signup = ({ navigation }) => {
           //@ts-ignore
            data: {productCatalog:questionnaire.products, laboratory:questionnaire.company, profilePicture:'Avatars/Default/Default.png', uuid}, 
           })
+          navigation.goBack()
         }catch(e){
           //@ts-ignore4
           console.log(e.response.data.message)
+          Alert.alert("Error", e.response.data.message)
         }  
         setIsRegistered(false)
         return
     }
-    //await uploadFiles([profID, profTitle, profilePicture], uuid);
+    await uploadFiles([profID, profTitle, profilePicture], uuid);
     console.log("Renderizado")
     Alert.alert(
       'Estatus', 
       'Creaste un nuevo usuario y mandaste tus documentos para ser admitido como medico exitosamente' +
        '\n espere la confirmacion en su correo',
     )
-    //await sendEmail(uuid)
+    await sendEmail(uuid)
     setIsRegistered(false)
-    //router.back()
-  }; */
+    navigation.goBack()
+  };
 
   const sleep = async (seconds) => {
     return new Promise((resolve) => {setTimeout(resolve, seconds * 1000)})
   }
 
-  
+  const uploadFiles = async (files, uuid) => {
+    setUploading(true);
+    console.log(uuid)
+     for (let i = 0; i < files.length; i++) {
+      await sleep(2)
+      try{
+       const resp =  await axios(`${process.env.EXPO_PUBLIC_GATEWAY_API_URL}/user/uploadDocuments`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
+          },
+          params:{
+            uuid:uuid
+          },
+           data: files[i]
+          })
+          console.log("RESP ", resp)
+        }catch(e){
+          console.log(e.response)
+          setIsRegistered(false)
+        }
+      //formData.append(`documents`, files[i] as any, files[i]?.name + files[i]?.type );
+    }
+  };
+
+  const sendEmail = async (uuid) => {
+    try {
+      const response = await axios(`${process.env.EXPO_PUBLIC_GATEWAY_API_URL}/user/sendMedicDocuments`,{
+          method: "POST",
+          params:{
+            uuid:uuid
+          }
+        })
+        console.log("Response: ", response)
+    } catch (error) {
+      console.log(error)
+      setIsRegistered(false)
+    }
+  }
+
+  //error handler
+  const onError = (errors, e) => {
+    return console.log(errors);
+  };
+
 
   useEffect(() => {
     if (error) {
@@ -350,7 +397,7 @@ const Signup = ({ navigation }) => {
                       open={isVisible}
                       limitDate={startDate}
                       onClose={() => { setIsVisible(false); } }
-                      onChangeStartDate={(value) => { onChange(value), setSelectedDate(value), setIsVisible(false), console.log(value); } }
+                      onChangeStartDate={(value) => { onChange(value), setSelectedDate(value), setIsVisible(false), console.log(value.replace(/\//g, '-')); } }
                       selectedDate={startDate} startDate={undefined}                    />
                   </>
                 )}
@@ -453,10 +500,6 @@ const Signup = ({ navigation }) => {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <>
-                    {
-                      //@ts-ignore
-                      errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>
-                    }
                     <Input
                       onInputChanged={(id, text) => {
                         console.log(text)
@@ -543,14 +586,9 @@ const Signup = ({ navigation }) => {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <>
-
-                    {errors.repeatPassword && (
-                      //@ts-ignore
-                      <Text style={styles.errorText}>{errors.repeatPassword.message}</Text>
-                    )}
                     <Input
                       onInputChanged={(id, text)=> onChange(text)}
-                      errorText={errors.password?.message}
+                      errorText={errors.repeatPassword?.message}
                       autoCapitalize="none"
                       id="repeatPassword"
                       onBlur={onBlur}
@@ -572,10 +610,6 @@ const Signup = ({ navigation }) => {
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <>
-                  {errors.role && (
-                    //@ts-ignore
-                    <Text style={styles.errorText}>{errors.role.message}</Text>
-                  )}
                   <Dropdown
                     style={[
                       styles.inputBtn
@@ -609,6 +643,10 @@ const Signup = ({ navigation }) => {
                       />
                     )}
                   />
+                  {errors.role && (
+                    //@ts-ignore
+                    <Text style={styles.errorText}>{errors.role.message}</Text>
+                  )}
                   </>
                 )}
                 name="role"
@@ -673,14 +711,19 @@ const Signup = ({ navigation }) => {
               <View style={{ flex: 1 }}>
                 <Text style={[styles.bottomLeft, {
                   color: COLORS.black
-                }]}>Al continuar, acepta nuestra Política de privacidad</Text>
+                }]}>
+                  Al continuar, acepta nuestros 
+                  <Link to={{screen: 'TaC'}} style={{color:COLORS.primary}}>
+                     Términos y condiciones de uso
+                  </Link>
+                </Text>
               </View>
             </View>
           </View>
           <Button
             title="Registrarse"
             filled
-            onPress={() => navigation.navigate("FillYourProfile")}
+            onPress={handleSubmit(handleRegister)}
             style={styles.button}
           />
           {/* <View>

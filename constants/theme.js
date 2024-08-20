@@ -42,7 +42,11 @@ export const COLORS = {
     transparentWhite: "rgba(255,255,255, .2)",
     transparentWhite2: "rgba(255,255,255, .5)",
     blackTie: "#474747",
-    grayTie: '#BCBCBC'
+    grayTie: '#BCBCBC',
+    green: '#cdfc78',
+    blue: '#69A9DC',
+    darkBlue: '#2F55A4',
+    redRose: '#E23F66'
 };
 
 export const SIZES = {

@@ -22,7 +22,8 @@ export const validateString = (id,value)=>{
 export const validateEmail = (id,value)=>{
     const constraints ={
         presence : {
-            allowEmpty: false
+            allowEmpty: false,
+            message: "^Este campo es obligatorio"
         }
     };
 

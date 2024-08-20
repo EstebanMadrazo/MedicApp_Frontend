@@ -68,6 +68,8 @@ import TrendingArticles from "./TrendingArticles";
 import Address from "./Address";
 import AddNewAddress from "./AddNewAddress";
 import Messaging from "./Messaging";
+import TermsAndConditions from "./TermsAndConditions";
+import ScheduleRegister from "./ScheduleRegister";
 
 export {
     Onboarding1,
@@ -139,5 +141,7 @@ export {
     TrendingArticles,
     Address,
     AddNewAddress,
-    Messaging
+    Messaging,
+    TermsAndConditions,
+    ScheduleRegister,
 }

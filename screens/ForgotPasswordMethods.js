@@ -15,7 +15,7 @@ const ForgotPasswordMethods = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Forgot Password" />
+        <Header title="Recuperar Contraseña" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.passwordContainer}>
             <Image
@@ -26,9 +26,8 @@ const ForgotPasswordMethods = ({ navigation }) => {
           </View>
           <Text style={[styles.title, {
             color: COLORS.greyscale900
-          }]}>Select which contact details
-            should we use to reset your password</Text>
-          <TouchableOpacity
+          }]}>Seleciona la opción que prefieras para recuperar tu contraseña</Text>
+          {/* <TouchableOpacity
             style={[
               styles.methodContainer,
               selectedMethod === 'sms' && { borderColor: COLORS.primary, borderWidth: 2 },
@@ -46,7 +45,7 @@ const ForgotPasswordMethods = ({ navigation }) => {
                 color: COLORS.black
               }]}>+1 111 ******99</Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={[
               styles.methodContainer,
@@ -64,11 +63,11 @@ const ForgotPasswordMethods = ({ navigation }) => {
               <Text style={styles.methodTitle}>via Email:</Text>
               <Text style={[styles.methodSubtitle, {
                 color: COLORS.black
-              }]}>and***ley@yourdomain.com</Text>
+              }]}>TuCorreo@TuDominio.com</Text>
             </View>
           </TouchableOpacity>
           <Button
-            title="Continue"
+            title="Continuar"
             filled
             style={styles.button}
             onPress={() =>

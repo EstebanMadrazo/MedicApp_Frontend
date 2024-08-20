@@ -8,11 +8,61 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import Button from '../components/Button';
 import { FontAwesome } from "@expo/vector-icons";
 import HorizontalDoctorCard from '../components/HorizontalDoctorCard';
+import axios from 'axios';
+import estados from '../data/estado.json'
 
 const Search = ({ navigation }) => {
   const refRBSheet = useRef();
   const [selectedCategories, setSelectedCategories] = useState(["1"]);
-  const [selectedRating, setSelectedRating] = useState(["1"]);
+  const [states, setStates] = useState([]);
+  const [specialities , setSpecialities] = useState([])
+  const [medics, setMedics] = useState([])
+  const [keyword, setkeyword] = useState();
+  
+
+  const resSpecialties = async () => {
+    await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/discoverSpecialities`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then(data => setSpecialities(data))
+  }
+
+  const handleSearch = async () => {
+    //Si todos los campos son vacios no permite continuar 
+    if (keyword == null && specialities.length == 0 && states.length == 0){
+      setMedics([])
+      return
+    }
+  
+    
+    const search = {
+      specialities,
+      states,
+      keyword
+    }
+  
+    const res = await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/filterMedics`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: search
+    }).catch(error => console.log("ERROR: ",error))
+  
+    const result = res.data
+   setMedics(result)
+  }
+
+
+  useEffect(() => {
+    resSpecialties()
+  }, [])
+
+
   /**
   * Render header
   */
@@ -53,22 +103,6 @@ const Search = ({ navigation }) => {
    * Render content
   */
   const renderContent = () => {
-    const [selectedTab, setSelectedTab] = useState('row');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filteredDoctors, setFilteredDoctors] = useState(doctors);
-    const [resultsCount, setResultsCount] = useState(0);
-
-    useEffect(() => {
-      handleSearch();
-    }, [searchQuery, selectedTab]);
-
-    const handleSearch = () => {
-      const allDoctors = doctors.filter((doctor) =>
-        doctor.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredDoctors(allDoctors);
-      setResultsCount(allDoctors.length);
-    };
 
     return (
       <View>
@@ -92,8 +126,8 @@ const Search = ({ navigation }) => {
             style={[styles.searchInput, {
               color: COLORS.greyscale900
             }]}
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
+            value={keyword}
+            onChangeText={(text) => setkeyword(text)}
           />
           <TouchableOpacity
             onPress={() => refRBSheet.current.open()}>
@@ -112,25 +146,25 @@ const Search = ({ navigation }) => {
             backgroundColor: COLORS.secondaryWhite,
             marginVertical: 16
           }}>
-            {resultsCount && resultsCount > 0 ? (
+            {medics.length > 0 ? (
               <>
                 {
                   <FlatList
-                    data={filteredDoctors}
-                    keyExtractor={(item) => item.id}
+                    data={medics}
+                    keyExtractor={(item) => item.uuid}
                     showsVerticalScrollIndicator={false}
                     renderItem={({ item }) => {
                       return (
                         <HorizontalDoctorCard
-                          name={item.name}
-                          image={item.image}
-                          distance={item.distance}
-                          price={item.price}
-                          consultationFee={item.consultationFee}
-                          hospital={item.hospital}
-                          rating={item.rating}
-                          numReviews={item.numReviews}
-                          isAvailable={item.isAvailable}
+                          name={item?.given_name + " " + item?.family_name}
+                          image={item?.profile_picture}
+                          //distance={item.distance}
+                          //price={item?.price}
+                          consultationFee={item?.price}
+                          //hospital={item.hospital}
+                          rating={item?.score}
+                          //numReviews={item.numReviews}
+                          isAvailable={true}
                           onPress={() => navigation.navigate("DoctorDetails")}
                         />
                       );
@@ -162,24 +196,24 @@ const Search = ({ navigation }) => {
   };
 
   // toggle rating selection
-  const toggleRating = (ratingId) => {
-    const updatedRatings = [...selectedRating];
-    const index = updatedRatings.indexOf(ratingId);
+  const toggleState = (state) => {
+    const updatedStates = [...states];
+    const index = updatedStates.indexOf(state);
 
     if (index === -1) {
-      updatedRatings.push(ratingId);
+      updatedStates.push(state);
     } else {
-      updatedRatings.splice(index, 1);
+      updatedStates.splice(index, 1);
     }
 
-    setSelectedRating(updatedRatings);
+    setStates(updatedStates);
   };
 
   // Category item
   const renderCategoryItem = ({ item }) => (
     <TouchableOpacity
       style={{
-        backgroundColor: selectedCategories.includes(item.id) ? COLORS.primary : "transparent",
+        backgroundColor: selectedCategories.includes(item) ? COLORS.primary : "transparent",
         padding: 10,
         marginVertical: 5,
         borderColor: COLORS.primary,
@@ -187,18 +221,18 @@ const Search = ({ navigation }) => {
         borderRadius: 24,
         marginRight: 12,
       }}
-      onPress={() => toggleCategory(item.id)}>
+      onPress={() => toggleCategory(item)}>
 
       <Text style={{
-        color: selectedCategories.includes(item.id) ? COLORS.white : COLORS.primary
-      }}>{item.name}</Text>
+        color: selectedCategories.includes(item) ? COLORS.white : COLORS.primary
+      }}>{item}</Text>
     </TouchableOpacity>
   );
 
   const renderRatingItem = ({ item }) => (
     <TouchableOpacity
       style={{
-        backgroundColor: selectedRating.includes(item.id) ? COLORS.primary : "transparent",
+        backgroundColor: states.includes(item.name) ? COLORS.primary : "transparent",
         paddingHorizontal: 16,
         paddingVertical: 6,
         marginVertical: 5,
@@ -209,13 +243,10 @@ const Search = ({ navigation }) => {
         flexDirection: "row",
         alignItems: "center",
       }}
-      onPress={() => toggleRating(item.id)}>
-      <View style={{ marginRight: 6 }}>
-        <FontAwesome name="star" size={14} color={selectedRating.includes(item.id) ? COLORS.white : COLORS.primary} />
-      </View>
+      onPress={() => toggleState(item.name)}>
       <Text style={{
-        color: selectedRating.includes(item.id) ? COLORS.white : COLORS.primary
-      }}>{item.title}</Text>
+        color: states.includes(item.name) ? COLORS.white : COLORS.primary
+      }}>{item.name}</Text>
     </TouchableOpacity>
   );
 
@@ -249,15 +280,15 @@ const Search = ({ navigation }) => {
         >
           <Text style={[styles.bottomTitle, {
             color: COLORS.greyscale900
-          }]}>Filter</Text>
+          }]}>Filtro</Text>
           <View style={styles.separateLine} />
           <View style={{ width: SIZES.width - 32 }}>
             <Text style={[styles.sheetTitle, {
               color: COLORS.greyscale900
-            }]}>Category</Text>
+            }]}>Especialidad</Text>
             <FlatList
-              data={categories}
-              keyExtractor={item => item.id}
+              data={specialities}
+              keyExtractor={item => item}
               showsHorizontalScrollIndicator={false}
               horizontal
               renderItem={renderCategoryItem}
@@ -265,10 +296,10 @@ const Search = ({ navigation }) => {
 
             <Text style={[styles.sheetTitle, {
               color: COLORS.greyscale900
-            }]}>Rating</Text>
+            }]}>Estados</Text>
             <FlatList
-              data={ratings}
-              keyExtractor={item => item.id}
+              data={estados}
+              keyExtractor={item => item.name}
               showsHorizontalScrollIndicator={false}
               horizontal
               renderItem={renderRatingItem}
@@ -279,7 +310,7 @@ const Search = ({ navigation }) => {
 
           <View style={styles.bottomContainer}>
             <Button
-              title="Reset"
+              title="Borrar"
               style={{
                 width: (SIZES.width - 32) / 2 - 8,
                 backgroundColor: COLORS.tansparentPrimary,
@@ -287,13 +318,13 @@ const Search = ({ navigation }) => {
                 borderColor: COLORS.tansparentPrimary
               }}
               textColor={COLORS.primary}
-              onPress={() => refRBSheet.current.close()}
+              onPress={() => {setSelectedCategories([]), setStates([])}}
             />
             <Button
-              title="Filter"
+              title="Filtrar"
               filled
               style={styles.logoutButton}
-              onPress={() => refRBSheet.current.close()}
+              onPress={() => {handleSearch(),refRBSheet.current.close()}}
             />
           </View>
         </RBSheet>

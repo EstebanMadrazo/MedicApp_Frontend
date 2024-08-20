@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#246BFD"
-      }
+      },
+      "package": "com.greenfieldteam.premed"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -29,6 +30,11 @@
     "plugins": [
       "expo-font",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0dd45136-2f61-4910-bf0c-774cdb4d6169"
+      }
+    }
   }
 }

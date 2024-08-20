@@ -26,13 +26,12 @@ export function useSession() {
 
 export function SessionProvider(props: PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState("session");
-
   return (
     <AuthContext.Provider
       value={{
         signIn: (token:string) => {
           // Perform sign-in logic here
-          setSession(token);
+          setSession(token as string);
         },
         signOut: async () => {
           setSession(null);

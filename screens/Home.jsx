@@ -7,12 +7,23 @@ import { banners, categories, recommendedDoctors } from '../data';
 import SubHeaderItem from '../components/SubHeaderItem';
 import Category from '../components/Category';
 import HorizontalDoctorCard from '../components/HorizontalDoctorCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSession } from "../ctx";
+import axios from 'axios';
 
 const Home = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [specialties , setSpecialities] = useState([])
   const [MedicCategories, setCategories] = useState()
+  const [info, setInfo] = useState()
+  const [token, setToken] = useState();
+  const {session} = useSession();
+  const [user, setUser] = useState();
+  const [medics, setMedics] = useState([])
+  const [seeAll, setSeeAll] = useState(false)
 
+  //console.log("MEDICS: ", medics)
+ 
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
       case "Médico General":
@@ -109,6 +120,17 @@ const Home = ({ navigation }) => {
     }
   };
   
+  const getData = async () => {
+    try {
+      let value = await AsyncStorage.getItem('userInfo')
+      setInfo(JSON.parse(value))
+      let token = await AsyncStorage.getItem('tokens')
+      token = token?.substring(1, token?.length-1)
+      setToken(token)
+    } catch (e) {
+      console.log(e)
+    }
+  }
   
   const resSpecialties = async () => {
     await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/discoverSpecialities`, {
@@ -121,15 +143,98 @@ const Home = ({ navigation }) => {
       .then(data => setSpecialities(data))
   }
 
+  const resUser = async() => {
+    try{
+      const responseInfo = await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/userInfo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization":'bearer ' + session,
+          "Refresher":'bearer ' + token,
+        },
+      })
+      setUser(responseInfo.data[0])
+      //console.log("response DATA: ",responseInfo.data[0])
+  }catch(e){
+    console.log("ERROR: ",e)
+  }
+}
+
+const resMedics = async () => {
+  try {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/discoverMedics?uuid=${info?.uuid}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    setMedics(data);
+  } catch (error) {
+    console.error("Error fetching medics:", error);
+  }
+}
+
+
+const handleSearch = async (data) => {
+  console.log("data: ",data)
+  //Si todos los campos son vacios no permite continuar 
+  if (data.keyword == null && data.specialties.length == 0 && data.states.length == 0){
+    setMedics([])
+    return
+  }
+
+  let keyword = data.keyword
+  let specialities = data.specialties
+  let states = data.states
+  const search = {
+    specialities,
+    states,
+    keyword
+  }
+
+  const res = await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/filterMedics`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: search
+  }).catch(error => console.log("ERROR: ",error))
+
+  const result = res.data
+ setMedics(result)
+}
+
+
+
   useEffect(() => {
     resSpecialties()
+    getData()
   }, [])
+
+  useEffect(() => {
+    if(token && session){
+      resUser()
+    }
+  }, [token, session])
+
+  useEffect(() =>{
+    if(info){
+      resMedics()
+    }
+  }, [info])
+
 
   useEffect(() => {
     const initialCategories = [
       {
         id: "0",
-        name: "Todos",
+        name: "Cercanos",
         icon: icons.category,
         iconColor: "rgba(36, 107, 253, 1)",
         backgroundColor: "rgba(36, 107, 253, .12)",
@@ -138,7 +243,7 @@ const Home = ({ navigation }) => {
       ...specialties.map((specialty, index) => mapSpecialtyToCategory(specialty, index))
     ];
     setCategories(initialCategories)
-    console.log("SPECIALTIES: ",specialties )
+    //console.log("SPECIALTIES: ",specialties )
   }, [specialties])
 
 
@@ -150,7 +255,7 @@ const Home = ({ navigation }) => {
       <View style={styles.headerContainer}>
         <View style={styles.viewLeft}>
           <Image
-            source={images.user1}
+            source={images.premedLogo}
             resizeMode='contain'
             style={styles.userIcon}
           />
@@ -158,7 +263,7 @@ const Home = ({ navigation }) => {
             <Text style={styles.greeeting}>Hola de nuevo 👋</Text>
             <Text style={[styles.title, {
               color: COLORS.greyscale900
-            }]}>Andrew Ainsley</Text>
+            }]}>{user?.given_name} {user?.family_name}</Text>
           </View>
         </View>
         <View style={styles.viewRight}>
@@ -170,14 +275,14 @@ const Home = ({ navigation }) => {
               style={[styles.bellIcon, { tintColor: COLORS.greyscale900 }]}
             />
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => navigation.navigate("Favourite")}>
             <Image
               source={icons.heartOutline}
               resizeMode='contain'
               style={[styles.bookmarkIcon, { tintColor: COLORS.greyscale900 }]}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     )
@@ -290,12 +395,12 @@ const Home = ({ navigation }) => {
     return (
       <View>
         <SubHeaderItem
-          title="Categories"
-          navTitle="See all"
-          onPress={() => navigation.navigate("Categories")}
+          title="Especialidades"
+          navTitle="Ver mas"
+          onPress={() => setSeeAll(!seeAll)}
         />
         <FlatList
-          data={MedicCategories?.slice(1, 9)}
+          data={seeAll? MedicCategories?.slice(1): MedicCategories?.slice(1,4)}
           keyExtractor={(item, index) => index.toString()}
           horizontal={false}
           numColumns={4} // Render two items per row
@@ -316,15 +421,17 @@ const Home = ({ navigation }) => {
    * render top doctor
    */
   const renderTopDoctors = () => {
-    const [selectedCategories, setSelectedCategories] = useState(["1"]);
+    
+    const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
+   
+    //const filteredDoctors = recommendedDoctors.filter(doctor => selectedCategories.includes("0") || selectedCategories.includes(doctor.categoryId));
 
-    const filteredDoctors = recommendedDoctors.filter(doctor => selectedCategories.includes("0") || selectedCategories.includes(doctor.categoryId));
 
     // Category item
     const renderCategoryItem = ({ item }) => (
       <TouchableOpacity
         style={{
-          backgroundColor: selectedCategories.includes(item.id) ? COLORS.primary : "transparent",
+          backgroundColor: selectedCategories.includes(item.name) ? COLORS.primary : "transparent",
           padding: 10,
           marginVertical: 5,
           borderColor: COLORS.primary,
@@ -332,33 +439,55 @@ const Home = ({ navigation }) => {
           borderRadius: 24,
           marginRight: 12,
         }}
-        onPress={() => toggleCategory(item.id)}>
+        onPress={() => toggleCategory(item.name)}>
         <Text style={{
-          color: selectedCategories.includes(item.id) ? COLORS.white : COLORS.primary
+          color: selectedCategories.includes(item.name) ? COLORS.white : COLORS.primary
         }}>{item.name}</Text>
       </TouchableOpacity>
     );
 
     // Toggle category selection
-    const toggleCategory = (categoryId) => {
+    const toggleCategory = async (category) => {
       const updatedCategories = [...selectedCategories];
-      const index = updatedCategories.indexOf(categoryId);
-
-      if (index === -1) {
-        updatedCategories.push(categoryId);
+      const index = updatedCategories.indexOf(category);
+      let temp
+      let states = []
+      console.log("Category: ", category)
+      if (updatedCategories.includes(category)) {
+        if (index > -1) {
+          updatedCategories.splice(index, 1);
+        }
       } else {
-        updatedCategories.splice(index, 1);
+        updatedCategories.push(category);
       }
 
       setSelectedCategories(updatedCategories);
+      
+      console.log("updatedCategories: ", updatedCategories)
+      if (updatedCategories.includes("Cercanos")) {
+        temp = updatedCategories.filter(item => item !== "Cercanos");
+        states.push(user?.state)
+      }else{
+        temp = updatedCategories
+        states.pop()
+      }
+
+      console.log("updatedCategories: ", temp)
+      const data = {
+        specialties: temp,
+        states: states,
+      }
+      //console.log(data)
+     await handleSearch(data)
+
     };
 
     return (
       <View>
         <SubHeaderItem
-          title="Top Doctors"
-          navTitle="See all"
-          onPress={() => navigation.navigate("TopDoctors")}
+          title="Medicos"
+          /* navTitle="See all"
+          onPress={() => navigation.navigate("TopDoctors")} */
         />
         <FlatList
           data={MedicCategories}
@@ -369,23 +498,24 @@ const Home = ({ navigation }) => {
         />
         <View style={{
           backgroundColor: COLORS.secondaryWhite,
-          marginVertical: 16
+          marginVertical: 16,
+          marginBottom:100
         }}>
           <FlatList
-            data={filteredDoctors}
-            keyExtractor={item => item.id}
+            data={medics}
+            keyExtractor={item => item.uuid}
             renderItem={({ item }) => {
               return (
                 <HorizontalDoctorCard
-                  name={item.name}
-                  image={item.image}
-                  distance={item.distance}
-                  price={item.price}
-                  consultationFee={item.consultationFee}
-                  hospital={item.hospital}
-                  rating={item.rating}
-                  numReviews={item.numReviews}
-                  isAvailable={item.isAvailable}
+                  name={item?.given_name + " " + item?.family_name}
+                  image={item?.profile_picture}
+                  //distance={item.distance}
+                  //price={item?.price}
+                  consultationFee={item?.price}
+                  //hospital={item.hospital}
+                  rating={item?.score}
+                  //numReviews={item.numReviews}
+                  isAvailable={true}
                   onPress={() => navigation.navigate("DoctorDetails")}
                 />
               )
@@ -397,7 +527,7 @@ const Home = ({ navigation }) => {
   }
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+      <View style={[styles.container, { backgroundColor: COLORS.white}]}>
         {renderHeader()}
         <ScrollView showsVerticalScrollIndicator={false}>
           {renderSearchBar()}

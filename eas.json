@@ -1,0 +1,31 @@
+{
+  "cli": {
+    "version": ">= 9.1.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "env":{
+        "EXPO_PUBLIC_API_URL":"https://premed.one/api/v1",
+        "EXPO_PUBLIC_RECOVERY_SECRET": "Vm0wd2VHUXhTWGhXV0doVllteEtXRmxVU2xOWFZsbDNXa1JTVjFKdGVEQmFWVll3VmpGYWMySkVUbHBXVmxwUVZqQmFZV1JIVmtsalJuQlhWakF3ZUZkV1pEUlpWMUpJVm10V1VtSkdXbGhaYTFaM1ZsWmFkR05GWkZwV01VcElWbTAxVjJGc1NuUmhSemxWVm14d1YxcFZXbXRYUjFKSVVteHdWMDFWY0ZsV1Z6QXhWREpHYzFOdVVsWmlSMmhoV1ZSR1lWbFdjRmhsUjBaWFlrZFNlVll5ZUVOV01rVjNZMFpTVjFaV2NGTmFSRVpEVld4Q1ZVMUVNRDA9",
+        "EXPO_PUBLIC_GATEWAY_API_URL": "https://premed.one/api/v1",
+        "EXPO_PUBLIC_CHAT_SOCKET": "https://premed.one" 
+      }
+    },
+    "production": {
+      "distribution": "internal",
+      "env":{
+        "EXPO_PUBLIC_API_URL":"https://api.greenfieldteam.net",
+        "EXPO_PUBLIC_RECOVERY_SECRET": "Vm0wd2VHUXhTWGhXV0doVllteEtXRmxVU2xOWFZsbDNXa1JTVjFKdGVEQmFWVll3VmpGYWMySkVUbHBXVmxwUVZqQmFZV1JIVmtsalJuQlhWakF3ZUZkV1pEUlpWMUpJVm10V1VtSkdXbGhaYTFaM1ZsWmFkR05GWkZwV01VcElWbTAxVjJGc1NuUmhSemxWVm14d1YxcFZXbXRYUjFKSVVteHdWMDFWY0ZsV1Z6QXhWREpHYzFOdVVsWmlSMmhoV1ZSR1lWbFdjRmhsUjBaWFlrZFNlVll5ZUVOV01rVjNZMFpTVjFaV2NGTmFSRVpEVld4Q1ZVMUVNRDA9",
+        "EXPO_PUBLIC_GATEWAY_API_URL": "http://192.168.1.95:8080/v1"  
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

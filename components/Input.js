@@ -18,13 +18,13 @@ const Input = (props) => {
   };
 
   return (
-    <View style={[styles.container]}>
+    <View style={[styles.container, props.styles]}>
       <View
         style={[
           styles.inputContainer,
           {
-            borderColor: isFocused ? COLORS.primary : COLORS.greyscale500,
-            backgroundColor: isFocused ? COLORS.tansparentPrimary : COLORS.greyscale500,
+            borderColor: isFocused ? COLORS.primary : props.color? props.color : COLORS.greyscale500,
+            backgroundColor: isFocused ? COLORS.tansparentPrimary : props.color? props.color : COLORS.greyscale500,
           },
         ]}
       >
@@ -53,7 +53,7 @@ const Input = (props) => {
       </View>
       {props.errorText && (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{props.errorText[0]}</Text>
+          <Text style={styles.errorText}>{props.errorText}</Text>
         </View>
       )}
     </View>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: SIZES.padding,
     paddingVertical: SIZES.padding2,
-    borderRadius: 12,
+    borderRadius: 4,
     borderWidth: 1,
     marginVertical: 5,
     flexDirection: 'row',

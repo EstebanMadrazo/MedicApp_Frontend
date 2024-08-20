@@ -45,7 +45,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontFamily: "bold",
-    color: "#2F55A4"
+    color: "#2F55A4",
+    textAlign:"center"
 
   },
   logo: {

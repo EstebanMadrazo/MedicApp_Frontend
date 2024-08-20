@@ -6,16 +6,15 @@ import { FontAwesome } from "@expo/vector-icons";
 const HorizontalDoctorCard = ({
     name,
     image,
-    distance,
-    hospital,
+    //distance,
+    //hospital,
     consultationFee,
     rating,
-    numReviews,
-    isAvailable,
+    //numReviews,
+    isAvailable = isAvailable? isAvailable: true,
     onPress
 }) => {
     const [isFavourite, setIsFavourite] = useState(false);
-
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -23,7 +22,10 @@ const HorizontalDoctorCard = ({
                 backgroundColor: COLORS.white
             }]}>
             <Image
-                source={image}
+                source={{
+                    uri:`${image}`,
+                    Cache:'none'
+                  }}
                 resizeMode='cover'
                 style={styles.image}
             />
@@ -44,17 +46,17 @@ const HorizontalDoctorCard = ({
                     <FontAwesome name="star" size={14} color="rgb(250, 159, 28)" />
                     <Text style={[styles.location, {
                         color: COLORS.grayscale700,
-                    }]}>{" "}{rating}  ({numReviews})</Text>
-                    <Text style={[styles.location, {
+                    }]}>{" "}{rating}  {/* ({numReviews}) */}</Text>
+                    {/* <Text style={[styles.location, {
                         color: COLORS.grayscale700,
-                    }]}>{"  "}|  {distance}</Text>
+                    }]}>{"  "}|  {distance}</Text> */}
                 </View>
-                <Text style={[styles.location, {
+                {/* <Text style={[styles.location, {
                     color: COLORS.grayscale700,
-                }]}>{hospital}</Text>
+                }]}>{hospital}</Text> */}
                 <View style={styles.bottomViewContainer}>
                     <View style={styles.priceContainer}>
-                        <Text style={styles.price}>{consultationFee}</Text>
+                        <Text style={styles.price}>${consultationFee}</Text>
                     </View>
                     <TouchableOpacity onPress={() => setIsFavourite(!isFavourite)}>
                         <Image
