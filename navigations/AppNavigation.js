@@ -24,7 +24,9 @@ import { AddNewAddress,
   ReviewSummary, Search, SelectPackage, SelectRescheduleAppointmentDate, SessionEnded, 
   SettingsLanguage, SettingsNotifications, SettingsPayment, SettingsPrivacyPolicy, SettingsSecurity, 
   Signup, TopDoctors, TrendingArticles, VideoCall, VideoCallHistoryDetails, VideoCallHistoryDetailsPlayRecordings, 
-  VoiceCall, VoiceCallHistoryDetails, VoiceCallHistoryDetailsPlayRecordings, Welcome,Tac } from '../screens';
+  VoiceCall, VoiceCallHistoryDetails, VoiceCallHistoryDetailsPlayRecordings, Welcome, TermsAndConditions,
+  ScheduleRegister} from '../screens';
+
 import BottomTabNavigation from './BottomTabNavigation';
 
 const Stack = createNativeStackNavigator();
@@ -70,6 +72,8 @@ const AppNavigation = () => {
         <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }}/>
+        <Stack.Screen name="TaC" component={TermsAndConditions}/> 
+        <Stack.Screen name="ScheduleRegister" component={ScheduleRegister}/> 
         <Stack.Screen name="ForgotPasswordMethods" component={ForgotPasswordMethods} />
         <Stack.Screen name="ForgotPasswordEmail" component={ForgotPasswordEmail} />
         <Stack.Screen name="ForgotPasswordPhoneNumber" component={ForgotPasswordPhoneNumber} />

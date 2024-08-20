@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         alignItems: "center",
         marginBottom: 12,
-        width: (SIZES.width - 32)/4
+        width: (SIZES.width - 32)/3
     },
     iconContainer: {
         width: 54,

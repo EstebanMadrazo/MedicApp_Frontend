@@ -1,13 +1,14 @@
 import { View, Text, StyleSheet, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SIZES, icons, images } from '../constants';
+import { COLORS, SIZES, icons, images, illustrations } from '../constants';
 import Header from '../components/Header';
 import { reducer } from '../utils/reducers/formReducers';
 import { validateInput } from '../utils/actions/formActions';
 import Input from '../components/Input';
 import Checkbox from 'expo-checkbox';
 import Button from '../components/Button';
+import axios from "axios";
 
 const isTestMode = true;
 
@@ -25,36 +26,63 @@ const ForgotPasswordEmail = ({ navigation }) => {
     const [formState, dispatchFormState] = useReducer(reducer, initialState);
     const [error, setError] = useState(null);
     const [isChecked, setChecked] = useState(false);
+    const [account, setAccount] = useState()
 
     const inputChangedHandler = useCallback(
         (inputId, inputValue) => {
             const result = validateInput(inputId, inputValue)
             dispatchFormState({ inputId, validationResult: result, inputValue })
+            setAccount(inputValue)
         },
         [dispatchFormState]
     )
 
     useEffect(() => {
         if (error) {
-            Alert.alert('An error occured', error)
+            Alert.alert('Error', error)
         }
     }, [error])
+
+    const handleReset = async() => {
+        const data = {account: account}
+        console.log(data)
+        if(formState.inputValidities['email'] !== undefined){
+            return
+        }
+      try{
+          await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/recoverPassword`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            data: data, 
+          })
+            //setOption(1)
+            navigation.navigate("OTPVerification", {account: account})
+          }catch(e){
+            setError('El usuario no se encuentra en la base de datos.')
+            setTimeout(() => {
+              setError('')
+            }, 4000);
+          } 
+    
+      };
 
     return (
         <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                <Header title="Forgot Password" />
-                <ScrollView style={{ marginVertical: 54 }} showsVerticalScrollIndicator={false}>
+                <Header title="Recuperar Contraseña" />
+                <ScrollView  showsVerticalScrollIndicator={false}>
                     <View style={styles.logoContainer}>
                         <Image
-                            source={images.logo}
+                            source={illustrations.password}
                             resizeMode='contain'
-                            style={styles.logo}
+                            style={styles.password}
                         />
                     </View>
                     <Text style={[styles.title, {
                         color: COLORS.black
-                    }]}>Enter to Your Email</Text>
+                    }]}>Ingresa tu Email</Text>
                     <Input
                         id="email"
                         onInputChanged={inputChangedHandler}
@@ -63,6 +91,7 @@ const ForgotPasswordEmail = ({ navigation }) => {
                         placeholderTextColor={COLORS.black}
                         icon={icons.email}
                         keyboardType="email-address"
+                        value={account}
                     />
                     <View style={styles.checkBoxContainer}>
                         <View style={{ flexDirection: 'row' }}>
@@ -75,19 +104,19 @@ const ForgotPasswordEmail = ({ navigation }) => {
                             <View style={{ flex: 1 }}>
                                 <Text style={[styles.privacy, {
                                     color: COLORS.black
-                                }]}>Remenber me</Text>
+                                }]}>Recuerdame</Text>
                             </View>
                         </View>
                     </View>
                     <Button
-                        title="Reset Password"
+                        title="Recuperar Contraseña"
                         filled
-                        onPress={() => navigation.navigate("OTPVerification")}
+                        onPress={handleReset}
                         style={styles.button}
                     />
                     <TouchableOpacity
                         onPress={() => navigation.navigate("Login")}>
-                        <Text style={styles.forgotPasswordBtnText}>Remenber the password?</Text>
+                        <Text style={styles.forgotPasswordBtnText}>¿Recuerdas tu contraseña?</Text>
                     </TouchableOpacity>
                     <View>
                     </View>
@@ -95,10 +124,10 @@ const ForgotPasswordEmail = ({ navigation }) => {
                 <View style={styles.bottomContainer}>
                     <Text style={[styles.bottomLeft, {
                         color: COLORS.black
-                    }]}>Don't have an account ?</Text>
+                    }]}>¿No tienes una cuenta?</Text>
                     <TouchableOpacity
                         onPress={() => navigation.navigate("Signup")}>
-                        <Text style={styles.bottomRight}>{"  "}Sign Up</Text>
+                        <Text style={styles.bottomRight}>{"  "}Regístrate</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -117,9 +146,8 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white
     },
     logo: {
-        width: 100,
-        height: 100,
-        tintColor: COLORS.primary
+        width: 150,
+        height: 150,
     },
     logoContainer: {
         alignItems: "center",
@@ -180,18 +208,18 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginVertical: 18,
-        position: "absolute",
+        position:"absolute",
         bottom: 12,
         right: 0,
         left: 0,
     },
     bottomLeft: {
-        fontSize: 14,
+        fontSize: 16,
         fontFamily: "regular",
         color: "black"
     },
     bottomRight: {
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: "medium",
         color: COLORS.primary
     },
@@ -201,7 +229,7 @@ const styles = StyleSheet.create({
         borderRadius: 30
     },
     forgotPasswordBtnText: {
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: "semiBold",
         color: COLORS.primary,
         textAlign: "center",

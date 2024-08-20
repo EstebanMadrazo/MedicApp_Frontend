@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //import OrSeparator from '../components/OrSeparator';
 import { Buffer } from 'buffer'
 import { useSession } from "../ctx";
+import { Controller, useForm, SubmitHandler, FieldValues } from "react-hook-form";
 
 const isTestMode = true;
 const initialState = {
@@ -36,36 +37,12 @@ const Login = ({ navigation }) => {
   const [isDisabled, setIsDisabled] = useState(false)
   const { signIn } = useSession();
 
-  const checkAndRedirectToHome  = async () => {
-    try {
-      let value = await AsyncStorage.getItem('patientInfo') 
-      let info
-      if (value) {
-        info = JSON.parse(value);
-      }
-      let token = await AsyncStorage.getItem('tokens') 
-      token = token?.substring(1, token?.length-1)
-      
-      if (token) {
-        signIn(token);
-        if (info.userRole === 'Medic') {
-          console.log("Is first login: ", info.firstLogin);
-          if (info.firstLogin === 1) {
-            setFirstLogin(true);
-            setUUID(info.uuid);
-            Alert.alert("Alerta", "Por favor cree su horario de citas para poder acceder a su cuenta");
-          } else {
-            router.push({ pathname: "/(appMedic)/(tabs)/Home" });
-            return
-          }
-        } else {
-          router.push({ pathname: "/(app)/(tabs)/Home", params: { uuid: info.uuid } });
-        }
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm();
+  
 
   const inputChangedHandler = useCallback(
     (inputId, inputValue) => {
@@ -74,9 +51,9 @@ const Login = ({ navigation }) => {
 
       //console.log("RESULT: ", result)
 
-      if (inputId === 'email' && result === undefined) {
+      if (inputId === 'email') {
         setAccount(inputValue);
-      } else if (inputId === 'password' && result === undefined) {
+      } else if (inputId === 'password') {
         setPassword(inputValue);
       }
 
@@ -110,6 +87,7 @@ const Login = ({ navigation }) => {
             await AsyncStorage.setItem('userInfo', JSON.stringify(responseData))
           } catch (e) { console.log("CATCH: ",e) }
           signIn(responseData.token);
+          console.log("Response Token: ",responseData.token)
           console.log(responseData)
           if (responseData.userRole == 'Medic') {
             console.log("Is first login: ", responseData.firstLogin )
@@ -117,6 +95,8 @@ const Login = ({ navigation }) => {
               //setFirstLogin(true)
               //setUUID(responseData?.uuid)
               Alert.alert("Alerta", "Por favor cree su horario de citas para poder acceder a su cuenta")
+              navigation.navigate("ScheduleRegister")
+              setIsDisabled(false)
             }else{
               //router.push({ pathname: "/(appMedic)/(tabs)/Home"});
               navigation.navigate("Main")
@@ -187,7 +167,7 @@ const Login = ({ navigation }) => {
             placeholderTextColor={COLORS.black}
             icon={icons.email}
             keyboardType="email-address"
-            value={"skdjsk"}
+            value={account}
           />
           <Input
             onInputChanged={inputChangedHandler}
@@ -198,6 +178,7 @@ const Login = ({ navigation }) => {
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
+            value={password}
           />
           <View style={styles.checkBoxContainer}>
             <View style={{ flexDirection: 'row' }}>
@@ -235,7 +216,7 @@ const Login = ({ navigation }) => {
               />
             </View>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ForgotPasswordMethods")}>
+            onPress={() => navigation.navigate("ForgotPasswordEmail")}>
             <Text style={styles.forgotPasswordBtnText}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
           {/* <View>

@@ -1,13 +1,16 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
 import { COLORS } from '../constants';
 import { OtpInput } from "react-native-otp-entry";
 import Button from "../components/Button";
+import axios from 'axios';
 
-const OTPVerification = ({ navigation }) => {
+const OTPVerification = ({ route, navigation }) => {
   const [time, setTime] = useState(50);
+  const [code, setCode] = useState()
+  const { account} = route.params
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -19,19 +22,37 @@ const OTPVerification = ({ navigation }) => {
     };
   }, []);
 
+  const handleCode = async()=> {
+    const data = {account: account, code:code}
+    console.log(data)
+    try{
+       await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/recoverCode`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json"
+         },
+         data:data, 
+       })
+       navigation.navigate("CreateNewPassword", {data: data}) 
+       }catch(e){
+         Alert.alert('Error','El código no coincide.')
+         console.log(e)
+       } 
+   };
+
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Forgot Password" />
+        <Header title="Recuperar Contraseña"/>
         <ScrollView>
           <Text style={[styles.title, {
             color: COLORS.black
-          }]}>Code has been send to +1 111 ******99</Text>
+          }]}>Digita el c&oacute;digo que se envi&oacute; a tu correo</Text>
           <OtpInput
-            numberOfDigits={4}
-            onTextChange={(text) => console.log(text)}
+            numberOfDigits={6}
+            onTextChange={(text) => setCode(text)}
             focusColor={COLORS.primary}
-            focusStickBlinkingDuration={500}
+            focusStickBlinkingDuration={1000}
             onFilled={(text) => console.log(`OTP is ${text}`)}
             theme={{
               pinCodeContainerStyle: {
@@ -47,7 +68,7 @@ const OTPVerification = ({ navigation }) => {
               }
             }}
           />
-          <View style={styles.codeContainer}>
+          {/* <View style={styles.codeContainer}>
             <Text style={[styles.code, {
               color: COLORS.greyscale900
             }]}>Resend code in</Text>
@@ -55,13 +76,13 @@ const OTPVerification = ({ navigation }) => {
             <Text style={[styles.code, {
               color: COLORS.greyscale900
             }]}>s</Text>
-          </View>
+          </View> */}
         </ScrollView>
         <Button
-          title="Verify"
+          title="Verificar"
           filled
           style={styles.button}
-          onPress={() => { navigation.navigate("CreateNewPassword") }}
+          onPress={handleCode}
         />
       </View>
     </SafeAreaView>

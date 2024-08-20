@@ -1,5 +1,7 @@
-import { Text, View, StyleSheet, ScrollView} from "react-native";
-import React, { Component } from "react";
+import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { COLORS, SIZES, icons, images, FONTS } from '../constants';
+import Header from "../components/Header";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const items = {
   "1. Servicio Ofrecido":
@@ -29,13 +31,15 @@ const itemsArray = Object.entries(items).map(([clave, valor]) => ({
   valor,
 }));
 
-export class TermsAndConditions extends Component {
-  render() {
+const TermsAndConditions = ({navigation}) =>{
     return (
+    <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
+      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+      <Header title={'Premed Meeting'}/>
       <ScrollView>
         <View style={styles.container}>
           <Text style={styles.title}>
-            Términos y Condiciones de Premed Meeting
+            Términos y Condiciones
           </Text>
           <Text style={styles.paragraph}>
             Bienvenido/a a nuestra aplicación de agendas médicas prepagadas.
@@ -59,32 +63,36 @@ export class TermsAndConditions extends Component {
           </Text>
         </View>
       </ScrollView>
+      </View>
+    </SafeAreaView>
     );
-  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    backgroundColor: "white",
-    paddingHorizontal:20
+    padding: 16,
+    backgroundColor: COLORS.white,
+  },
+  area: {
+    flex: 1,
+    backgroundColor: COLORS.white
   },
   title: {
-    fontFamily: "pop-b",
+    fontFamily: "bold",
     color: "#005AC1",
     fontSize: 24,
     textAlign: "center",
     marginVertical: 10,
   },
-  bulletPoint: { fontFamily: "pop-sb", fontSize: 20 },
+  bulletPoint: { fontFamily: "bold", fontSize: 20 },
   bulletItem: {
-    fontFamily: "pop",
+    fontFamily: "regular",
     fontSize: 12,
     marginHorizontal:15,
   },
   paragraph: {
-    fontFamily: "pop",
+    fontFamily: "regular",
     fontSize: 14,
     marginVertical: 15,
     textAlign:"auto"
