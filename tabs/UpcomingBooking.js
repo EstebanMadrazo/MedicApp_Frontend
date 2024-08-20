@@ -1,22 +1,67 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { upcomingAppointments } from '../data';
 import { SIZES, COLORS, icons } from '../constants';
 import RBSheet from "react-native-raw-bottom-sheet";
 import Button from '../components/Button';
-import { useNavigation } from '@react-navigation/native';
+import { Link, useNavigation } from '@react-navigation/native';
 import { FontAwesome } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const UpcomingBooking = () => {
   const [bookings, setBookings] = useState(upcomingAppointments);
+  const [userInfo, setUserInfo] = useState();
+  const [appointments, setAppointments] = useState([]);
   const refRBSheet = useRef();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getAppointments()
+    }
+    fetchData()
+  },[])
+
+  const getAppointments = async () => {
+    const data = JSON.parse(await AsyncStorage.getItem('userInfo'))
+    setUserInfo(data)
+    console.log(data)
+    try{
+      
+      const appointments = await axios({
+        url:"https://premed.one/api/v1/appointments/appointmentInfo",
+        method:"GET",
+        params:{
+          uuid:data.uuid,
+          role:data.userRole 
+        }
+      }) 
+      console.log('Appointments ',appointments.data.appointmentsInfo)
+      const upcomingAppoint = []
+      const today = new Date()
+      for(let i = 0; i< appointments.data.appointmentsInfo.length; i++){
+        //Convierte 2024-04-07 11:00:00 en 2024-04-07T17:00:00.000Z, es decir, de local a utc 
+        const appointmentDate = new Date(appointments.data.appointmentsInfo[i].appointment.date)
+
+        //Convierte de utc a local y despues compara si la fecha actual es menor a la fecha de la cita
+        if((today <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && appointments.data.appointmentsInfo[i].appointment.is_cancelled == 0){
+          upcomingAppoint.push(appointments.data.appointmentsInfo[i])
+        }
+      }
+      //setAppointments(appointments.data.appointmentsInfo)
+      console.log(upcomingAppoint.length)
+      setAppointments(upcomingAppoint)
+    }catch(err){
+      console.err(err.response.data)
+    }
+  }
 
   return (
     <View style={[styles.container, {
       backgroundColor: COLORS.tertiaryWhite
     }]}>
-      <FlatList
+      {/*<FlatList
         data={bookings}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
@@ -63,13 +108,13 @@ const UpcomingBooking = () => {
                 </View>
               </View>
               <TouchableOpacity
-               onPress={() => navigation.navigate({
-                name:
-                  item.package === "Messaging" ? "MyAppointmentMessaging" :
-                    item.package === "Video Call" ? "MyAppointmentVideoCall" :
-                      item.package === "Voice Call" ? "MyAppointmentVoiceCall" : null
-              })} 
-               style={styles.iconContainer}>
+                onPress={() => navigation.navigate({
+                  name:
+                    item.package === "Messaging" ? "MyAppointmentMessaging" :
+                      item.package === "Video Call" ? "MyAppointmentVideoCall" :
+                        item.package === "Voice Call" ? "MyAppointmentVoiceCall" : null
+                })}
+                style={styles.iconContainer}>
                 <Image
                   source={
                     item.package === "Messaging"
@@ -103,7 +148,105 @@ const UpcomingBooking = () => {
             </View>
           </TouchableOpacity>
         )}
-      />
+      />*/}
+      {appointments.length === 0 ? (
+        <Text style={styles.item}>No appointments available</Text>
+      ) : (
+        <FlatList
+          data={appointments.reverse()}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={[styles.cardContainer, {
+              backgroundColor: COLORS.white,
+            }]}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate({
+                  name:
+                    item.appointment.is_video_call == true ? 
+                    "MyAppointmentVideocall" :
+                    "MyAppointmentMessaging",
+                    params: {
+                      appointmentInfo: item // or any other parameter you want to pass
+                    }
+                })}
+                style={styles.detailsViewContainer}>
+                <View style={styles.detailsContainer}>
+                  <View>
+                    <Image
+                      source={{
+                          uri:`${item.info.profile_picture}`,
+                          Cache:'none'
+                        }}
+                      resizeMode='cover'
+                      style={styles.serviceImage}
+                    />
+                    <View style={styles.reviewContainer}>
+                      <FontAwesome name="star" size={12} color="orange" />
+                      <Text style={styles.rating}>{item.info.score}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.detailsRightContainer}>
+                    <Text style={[styles.name, {
+                      color: COLORS.greyscale900
+                    }]}>{item.info.given_name}</Text>
+                    <Text style={[styles.name, {
+                      color: COLORS.greyscale900
+                    }]}>{item.info.family_name}</Text>
+                    <View style={styles.priceContainer}>
+                      <Text style={[styles.address, {
+                        color: COLORS.grayscale700,
+                      }]}>{item.appointment.is_video_call === 1 ? "Virtual":"Presencial"} - </Text>
+                      <View style={styles.statusContainer}>
+                        <Text style={styles.statusText}>{item.appointment.is_cancelled == 0 ? "Agendado":""}</Text>
+                      </View>
+                    </View>
+                    <Text style={[styles.address, {
+                      color: COLORS.grayscale700,
+                    }]}>{item.appointment.date}</Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  onPress={() => 
+                    navigation.navigate({
+                      name:
+                        item.appointment.is_video_call == true ? 
+                        "MyAppointmentMessaging" :
+                        "MyAppointmentVideoCall",
+                      
+                    })
+                  }
+                  style={styles.iconContainer}>
+                  <Image
+                    source={
+                      item.appointment.is_video_call == true
+                        ? icons.videoCamera
+                        : icons.appointment 
+                        // Add a fallback in case none of the conditions match
+                    }
+                    resizeMode='contain'
+                    style={styles.chatIcon}
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+              <View style={[styles.separateLine, {
+                marginVertical: 10,
+                backgroundColor: COLORS.grayscale200,
+              }]} />
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  onPress={() => refRBSheet.current.open()}
+                  style={styles.cancelBtn}>
+                  <Text style={styles.cancelBtnText}>Cancelar Cita</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("RescheduleAppointment")}
+                  style={styles.receiptBtn}>
+                  <Text style={styles.receiptBtnText}>Reagendar Cita</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+        )}
+        />
+      )}
       <RBSheet
         ref={refRBSheet}
         closeOnDragDown={true}
@@ -127,7 +270,7 @@ const UpcomingBooking = () => {
         }}>
         <Text style={[styles.bottomSubtitle, {
           color: COLORS.red
-        }]}>Cancel Appointment</Text>
+        }]}>Cancelar Cita</Text>
         <View style={[styles.separateLine, {
           backgroundColor: COLORS.grayscale200,
         }]} />
@@ -135,15 +278,15 @@ const UpcomingBooking = () => {
         <View style={styles.selectedCancelContainer}>
           <Text style={[styles.cancelTitle, {
             color: COLORS.greyscale900
-          }]}>Are you sure you want to cancel your appointment?</Text>
+          }]}>¿Estás seguro de que deseas cancelar la cita?</Text>
           <Text style={[styles.cancelSubtitle, {
             color: COLORS.grayscale700
-          }]}>Only 80% of the money you can refund from your payment according to our policy.</Text>
+          }]}>El reembolso procederá de acuerdo con nuestras políticas de reembolsos, especificadas en los <Link to={{screen: 'TaC'}} style={{color:COLORS.primary}}>términos y condiciones.</Link></Text>
         </View>
 
         <View style={styles.bottomContainer}>
           <Button
-            title="Cancel"
+            title="Cancelar"
             style={{
               width: (SIZES.width - 32) / 2 - 8,
               backgroundColor: COLORS.tansparentPrimary,
@@ -154,7 +297,7 @@ const UpcomingBooking = () => {
             onPress={() => refRBSheet.current.close()}
           />
           <Button
-            title="Yes, Cancel"
+            title="Sí, Cancelar"
             filled
             style={styles.removeButton}
             onPress={() => {
@@ -164,6 +307,7 @@ const UpcomingBooking = () => {
           />
         </View>
       </RBSheet>
+      
     </View>
   )
 };

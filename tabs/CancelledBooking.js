@@ -1,18 +1,62 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SIZES, COLORS, icons } from '../constants';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from "@expo/vector-icons";
 import { cancelledAppointments } from '../data';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const CancelledBooking = () => {
   const [bookings, setBookings] = useState(cancelledAppointments);
+  const [userInfo, setUserInfo] = useState();
+  const [appointments, setAppointments] = useState([]);
   const navigation = useNavigation();
 
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      await getAppointments()
+    }
+    fetchData()
+  },[])
+
+  const getAppointments = async () => {
+    const data = JSON.parse(await AsyncStorage.getItem('userInfo'))
+    setUserInfo(data)
+    console.log(data)
+    try{
+      
+      const appointments = await axios({
+        url:"https://premed.one/api/v1/appointments/appointmentInfo",
+        method:"GET",
+        params:{
+          uuid:data.uuid,
+          role:data.userRole 
+        }
+      }) 
+      console.log('Appointments ',appointments.data.appointmentsInfo)
+      const cancelledAppoint = []
+      const today = new Date()
+      console.log(appointments.data.appointmentsInfo.length)
+      for(let i = 0; i< appointments.data.appointmentsInfo.length; i++){
+        console.log(appointments.data.appointmentsInfo[i].appointment.uuid)
+        if(appointments.data.appointmentsInfo[i].appointment.is_cancelled == 1){
+          cancelledAppoint.push(appointments.data.appointmentsInfo[i])
+        }
+      }
+      //setAppointments(appointments.data.appointmentsInfo)
+      console.log(cancelledAppoint.length)
+      setAppointments(cancelledAppoint)
+    }catch(err){
+      console.err(err.response.data)
+    }
+  }
   return (
     <View style={[styles.container, {
       backgroundColor: COLORS.tertiaryWhite
     }]}>
+      {/*
       <FlatList
         data={bookings}
         keyExtractor={item => item.id}
@@ -61,6 +105,73 @@ const CancelledBooking = () => {
                         : item.package === "Voice Call"
                           ? icons.telephone
                           : null // Add a fallback in case none of the conditions match
+                  }
+                  resizeMode='contain'
+                  style={styles.chatIcon}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.separateLine, {
+              marginVertical: 10,
+              backgroundColor: COLORS.grayscale200,
+            }]} />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ReviewSummary")}
+                style={styles.receiptBtn}>
+                <Text style={styles.receiptBtnText}>View</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        )}
+      />*/}
+      <FlatList
+        data={appointments}
+        keyExtractor={item => item.appointment.uuid}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={[styles.cardContainer, {
+            backgroundColor: COLORS.white,
+          }]}>
+            <View style={styles.detailsViewContainer}>
+              <View style={styles.detailsContainer}>
+                <View>
+                  <Image
+                    source={{
+                      uri:`${item.info.profile_picture}`
+                    }}
+                    resizeMode='cover'
+                    style={styles.serviceImage}
+                  />
+                  <View style={styles.reviewContainer}>
+                    <FontAwesome name="star" size={12} color="orange" />
+                    <Text style={styles.rating}>{item.info.score}</Text>
+                  </View>
+                </View>
+                <View style={styles.detailsRightContainer}>
+                  <Text style={[styles.name, {
+                    color: COLORS.greyscale900
+                  }]}>{item.doctor}</Text>
+                  <View style={styles.priceContainer}>
+                    <Text style={[styles.address, {
+                      color: COLORS.grayscale700,
+                    }]}>{item.appointment.is_video_call === 1 ? "Virtual":"Presencial"} -  </Text>
+                    <View style={styles.statusContainer}>
+                      <Text style={styles.statusText}>{item.appointment.is_cancelled == 1 ? "Cancelado":""}</Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.address, {
+                    color: COLORS.grayscale700,
+                  }]}>{item.appointment.date}</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.iconContainer}>
+                <Image
+                  source={
+                    item.appointment.is_video_call == true
+                        ? icons.videoCamera
+                        : icons.appointment 
+                        // Add a fallback in case none of the conditions match
                   }
                   resizeMode='contain'
                   style={styles.chatIcon}

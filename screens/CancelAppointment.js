@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { ScrollView } from 'react-native-virtualized-view';
 import { COLORS, SIZES } from "../constants";
@@ -92,6 +92,12 @@ const CancelAppointment = ({ navigation }) => {
     )
   }
 
+  const cancelAppointmentHandler = () => {
+    console.log('Appointment Cancelled')
+    Alert.alert('Cita cancelada','Se regresará el dinero a la cuenta desde la que se hizo el pago. \nEsto puede tardar un máximo de 5 días hábiles.')
+    navigation.navigate('Home')
+  }
+
   /**
       * Render submit buttons
       */
@@ -104,7 +110,7 @@ const CancelAppointment = ({ navigation }) => {
           title="Submit"
           filled
           style={styles.submitBtn}
-          onPress={() => navigation.navigate("CancelAppointmentPaymentMethods")}
+          onPress={cancelAppointmentHandler}
         />
       </View>
     )
