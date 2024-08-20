@@ -1,10 +1,27 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import React, {useState, useEffect} from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { ScrollView } from 'react-native-virtualized-view';
+import { useRoute } from '@react-navigation/native';
 
 const MyAppointmentVideoCall = ({ navigation }) => {
+  const [age, setAge] = useState(0)
+  const route = useRoute();
+  const { appointmentInfo } = route.params || {};
+  console.log(appointmentInfo)
+
+  const getAge = () => {
+    const birthdate = new Date(appointmentInfo.info.birthdate)
+    birthdate.setMinutes(birthdate.getMinutes() - birthdate.getTimezoneOffset())
+    const actualAge = new Date().getFullYear() - birthdate.getFullYear() 
+    setAge(actualAge)
+  }
+
+  useEffect(()=>{
+    getAge()
+  })
+
   /**
    * Render header
    */
@@ -51,89 +68,91 @@ const MyAppointmentVideoCall = ({ navigation }) => {
             backgroundColor: COLORS.white,
           }]}>
             <Image
-              source={images.doctor5}
-              resizeMode='contain'
+              source={{
+                uri:appointmentInfo.info.profile_picture
+              }}
+              resizeMode='cover'
               style={styles.doctorImage}
             />
             <View>
               <Text style={[styles.doctorName, {
                 color: COLORS.greyscale900
-              }]}>Dr.  Jenny Watson</Text>
+              }]}>{appointmentInfo.info.given_name}</Text>
+              <Text style={[styles.doctorName, {
+                color: COLORS.greyscale900
+              }]}>{appointmentInfo.info.family_name}</Text>
               <View style={[styles.separateLine, {
                 backgroundColor: COLORS.grayscale200,
               }]} />
               <Text style={[styles.doctorSpeciality, {
                 color: COLORS.greyScale800
-              }]}>Immunologists</Text>
+              }]}>{}</Text>
               <Text style={[styles.doctorHospital, {
                 color: COLORS.greyScale800
-              }]}>Christ Hospital in London, UK</Text>
+              }]}>{}</Text>
             </View>
           </View>
         </View>
         <Text style={[styles.subtitle, {
           color: COLORS.greyscale900
-        }]}>Scheduled Appointment</Text>
+        }]}>Cita Programada</Text>
         <Text style={[styles.description, {
           color: COLORS.greyScale800,
-        }]}>Today, December 22, 2022</Text>
+        }]}>{new Date(appointmentInfo.appointment.date).toDateString()}</Text>
         <Text style={[styles.description, {
           color: COLORS.greyScale800,
-        }]}>16:00 - 16:30 PM (30 minutes)</Text>
+        }]}>{appointmentInfo.appointment.date.split(" ")[1]}</Text>
         <Text style={[styles.subtitle, {
           color: COLORS.greyscale900
-        }]}>Patient Information</Text>
+        }]}>Información del Paciente</Text>
         <View style={styles.viewContainer}>
           <View style={styles.viewLeft}>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>Full Name</Text>
+            }]}>Nombre Completo</Text>
           </View>
           <View>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>:  Andrew Ainsley</Text>
+            }]}>:  {appointmentInfo.info.given_name} {appointmentInfo.info.family_name}</Text>
           </View>
         </View>
         <View style={styles.viewContainer}>
           <View style={styles.viewLeft}>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>Gender</Text>
+            }]}>Sexo</Text>
           </View>
           <View>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>:  Male</Text>
+            }]}>:  {appointmentInfo.info.sex}</Text>
           </View>
         </View>
         <View style={styles.viewContainer}>
           <View style={styles.viewLeft}>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>Age</Text>
+            }]}>Edad</Text>
           </View>
           <View>
             <Text style={[styles.description, {
               color: COLORS.greyScale800,
-            }]}>:  27</Text>
-          </View>
-        </View>
-        <View style={styles.viewContainer}>
-          <View style={styles.viewLeft}>
-            <Text style={[styles.description, {
-              color: COLORS.greyScale800,
-            }]}>Problem</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.description, {
-              color: COLORS.greyScale800,
-            }]}>:  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor. </Text>
+            }]}>:  {age}</Text>
           </View>
         </View>
         <Text style={[styles.subtitle, {
           color: COLORS.greyscale900
-        }]}>Your Package</Text>
+        }]}>Información Médica</Text>
+        <Text style={[styles.description, {
+          color: COLORS.greyScale800,
+        }]}>{new Date(appointmentInfo.appointment.date).toDateString()}</Text>
+        <Text style={[styles.description, {
+          color: COLORS.greyScale800,
+        }]}>{appointmentInfo.appointment.date.split(" ")[1]}</Text>
+        <Text style={[styles.subtitle, {
+          color: COLORS.greyscale900
+        }]}>Tipo de Cita</Text>
         <View style={{ backgroundColor: COLORS.tertiaryWhite }}>
           <View style={[styles.pkgContainer, {
             backgroundColor: COLORS.white
@@ -149,17 +168,17 @@ const MyAppointmentVideoCall = ({ navigation }) => {
               <View>
                 <Text style={[styles.pkgTitle, {
                   color: COLORS.greyscale900
-                }]}>Video Call</Text>
+                }]}>Videollamada</Text>
                 <Text style={[styles.pkgDescription, {
                   color: COLORS.greyScale800
-                }]}>Video call with doctor</Text>
+                }]}>videollamda con médico</Text>
               </View>
             </View>
             <View style={styles.pkgRightContainer}>
-              <Text style={styles.pkgPrice}>$40</Text>
+              <Text style={styles.pkgPrice}>${appointmentInfo.appointment.total}</Text>
               <Text style={[styles.pkgPriceTag, {
                 color: COLORS.greyScale800
-              }]}>(paid)</Text>
+              }]}>({appointmentInfo.appointment.is_verified ? "pagado" :"pendiente"})</Text>
             </View>
           </View>
         </View>
@@ -186,7 +205,7 @@ const MyAppointmentVideoCall = ({ navigation }) => {
             resizeMode='contain'
             style={styles.btnIcon}
           />
-          <Text style={styles.btnText}>Video Call (Start at 10:00 AM)</Text>
+          <Text style={styles.btnText}>Videollamada (Empieza a {appointmentInfo.appointment.date.split(" ")[1]})</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

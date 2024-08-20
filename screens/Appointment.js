@@ -8,7 +8,7 @@ import { CancelledBooking, CompletedBooking, UpcomingBooking } from '../tabs';
 const renderScene = SceneMap({
   first: UpcomingBooking,
   second: CompletedBooking,
-  third: CancelledBooking
+  //third: CancelledBooking
 });
 
 const Appointment = ({ navigation }) => {
@@ -18,7 +18,7 @@ const Appointment = ({ navigation }) => {
   const [routes] = React.useState([
     { key: 'first', title: 'Upcoming' },
     { key: 'second', title: 'Completed' },
-    { key: 'third', title: 'Cancelled' }
+    //{ key: 'third', title: 'Cancelled' }
   ]);
 
   const renderTabBar = (props) => (
