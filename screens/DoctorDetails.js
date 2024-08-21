@@ -7,7 +7,11 @@ import { doctorReviews } from '../data';
 import ReviewCard from '../components/ReviewCard';
 import Button from '../components/Button';
 
-const DoctorDetails = ({ navigation }) => {
+const DoctorDetails = ({route, navigation }) => {
+    const {medicInfo} = route.params
+    const medic = JSON.parse(medicInfo)
+
+    console.log(medicInfo)
     /**
      * Render header
      */
@@ -28,10 +32,10 @@ const DoctorDetails = ({ navigation }) => {
                     </TouchableOpacity>
                     <Text style={[styles.headerTitle, {
                         color: COLORS.black
-                    }]}>Dr. Jenny Watson</Text>
+                    }]}>{medic.given_name} {medic.family_name}</Text>
                 </View>
                 <View style={styles.viewRight}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => setIsFavourite(!isFavourite)}>
                         <Image
                             source={isFavourite ? icons.heart2 : icons.heart2Outline}
@@ -49,7 +53,7 @@ const DoctorDetails = ({ navigation }) => {
                                 tintColor: COLORS.black
                             }]}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
         )
@@ -60,7 +64,7 @@ const DoctorDetails = ({ navigation }) => {
     const renderContent = () => {
         const [expanded, setExpanded] = useState(false);
 
-        const description = `Dr. Jenny Watson is the top most Immunologists specialist in Christ Hospital at London. She achived several awards for her wonderful contribution in medical field. She is available for private consultation.`
+        //const description = `Dr. Jenny Watson is the top most Immunologists specialist in Christ Hospital at London. She achived several awards for her wonderful contribution in medical field. She is available for private consultation.`
 
         const toggleExpanded = () => {
             setExpanded(!expanded);
@@ -73,28 +77,38 @@ const DoctorDetails = ({ navigation }) => {
                         backgroundColor: COLORS.white,
                     }]}>
                         <Image
-                            source={images.doctor5}
+                            source={{
+                                uri:`${medic.profile_picture}`,
+                                Cache:'none'
+                              }}
                             resizeMode='contain'
                             style={styles.doctorImage}
                         />
                         <View>
                             <Text style={[styles.doctorName, {
                                 color: COLORS.greyscale900
-                            }]}>Dr.  Jenny Watson</Text>
+                            }]}>{medic.given_name} {medic.family_name}</Text>
                             <View style={[styles.separateLine, {
                                 backgroundColor: COLORS.grayscale200,
                             }]} />
-                            <Text style={[styles.doctorSpeciality, {
-                                color: COLORS.greyScale800
-                            }]}>Immunologists</Text>
+                            <View style={{flexDirection:"row"}}>
+                                {medic.specialities.specialities.map((item) =>(
+                                    <Text key={item.name} style={[styles.doctorSpeciality, {
+                                        color: COLORS.greyScale800
+                                    }]}>{item.name}</Text>
+                                ))}
+                            </View>
                             <Text style={[styles.doctorHospital, {
                                 color: COLORS.greyScale800
-                            }]}>Christ Hospital in London, UK</Text>
+                            }]}>{medic.main_st} | {medic.street_intersections}</Text>
+                            <Text style={[styles.doctorHospital, {
+                                color: COLORS.greyScale800
+                            }]}>{medic.neighborhood} | {medic.office_state}</Text>
                         </View>
                     </View>
                 </View>
                 <View style={styles.featureContainer}>
-                    <View style={styles.featureItemContainer}>
+                    {/* <View style={styles.featureItemContainer}>
                         <View style={styles.featureIconContainer}>
                             <Image
                                 source={icons.friends}
@@ -106,19 +120,19 @@ const DoctorDetails = ({ navigation }) => {
                         <Text style={[styles.featureItemName, {
                             color: COLORS.greyScale800
                         }]}>patients</Text>
-                    </View>
+                    </View> */}
                     <View style={styles.featureItemContainer}>
                         <View style={styles.featureIconContainer}>
                             <Image
-                                source={icons.activity}
+                                source={icons.wallet}
                                 resizeMode='contain'
                                 style={styles.featureIcon}
                             />
                         </View>
-                        <Text style={styles.featureItemNum}>10+</Text>
+                        <Text style={styles.featureItemNum}>Precio de consulta</Text>
                         <Text style={[styles.featureItemName, {
                             color: COLORS.greyScale800
-                        }]}>years exper..</Text>
+                        }]}>${medic.price}</Text>
                     </View>
                     <View style={styles.featureItemContainer}>
                         <View style={styles.featureIconContainer}>
@@ -128,28 +142,28 @@ const DoctorDetails = ({ navigation }) => {
                                 style={styles.featureIcon}
                             />
                         </View>
-                        <Text style={styles.featureItemNum}>4.8</Text>
+                        <Text style={styles.featureItemNum}>Calificación</Text>
                         <Text style={[styles.featureItemName, {
                             color: COLORS.greyScale800
-                        }]}>rating</Text>
+                        }]}>{medic.score}</Text>
                     </View>
                     <View style={styles.featureItemContainer}>
                         <View style={styles.featureIconContainer}>
                             <Image
-                                source={icons.chatBubble2}
+                                source={icons.videoCamera}
                                 resizeMode='contain'
                                 style={styles.featureIcon}
                             />
                         </View>
-                        <Text style={styles.featureItemNum}>4,942</Text>
+                        <Text style={styles.featureItemNum}>Citas virtuales</Text>
                         <Text style={[styles.featureItemName, {
                             color: COLORS.greyScale800
-                        }]}>reviews</Text>
+                        }]}>{medic.is_videocall_allowed? "Si acepta": "No acepta"}</Text>
                     </View>
                 </View>
-                <Text style={[styles.contentTitle, {
+                {/* <Text style={[styles.contentTitle, {
                     color: COLORS.greyscale900,
-                }]}>About me</Text>
+                }]}>Precio de consulta</Text>
                 <Text style={[styles.description, {
                     color: COLORS.grayscale700,
                 }]} numberOfLines={expanded ? undefined : 2}>{description}</Text>
@@ -186,7 +200,7 @@ const DoctorDetails = ({ navigation }) => {
                             numLikes={item.numLikes}
                         />
                     )}
-                />
+                /> */}
             </View>
         )
     }
@@ -204,7 +218,7 @@ const DoctorDetails = ({ navigation }) => {
                 backgroundColor: COLORS.white,
             }]}>
                 <Button
-                    title="Book Appointment"
+                    title="Agendar Cita"
                     filled
                     style={styles.btn}
                     onPress={() => navigation.navigate("BookAppointment")}
@@ -264,7 +278,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     doctorCard: {
-        height: 142,
+        height: 242,
         width: SIZES.width - 32,
         borderRadius: 32,
         backgroundColor: COLORS.white,
@@ -289,13 +303,13 @@ const styles = StyleSheet.create({
         marginVertical: 12
     },
     doctorSpeciality: {
-        fontSize: 12,
+        fontSize: 14,
         color: COLORS.greyScale800,
         fontFamily: "medium",
         marginBottom: 8
     },
     doctorHospital: {
-        fontSize: 12,
+        fontSize: 14,
         color: COLORS.greyScale800,
         fontFamily: "medium"
     },
@@ -303,7 +317,7 @@ const styles = StyleSheet.create({
         width: SIZES.width - 32,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "space-around",
         marginVertical: 16
     },
     featureItemContainer: {
@@ -329,7 +343,7 @@ const styles = StyleSheet.create({
         marginVertical: 6
     },
     featureItemName: {
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: "medium",
         color: COLORS.greyScale800
     },

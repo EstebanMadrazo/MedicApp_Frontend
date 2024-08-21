@@ -21,8 +21,6 @@ const Home = ({ navigation }) => {
   const [user, setUser] = useState();
   const [medics, setMedics] = useState([])
   const [seeAll, setSeeAll] = useState(false)
-
-  console.log("MEDICS: ", medics)
  
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
@@ -516,7 +514,7 @@ const handleSearch = async (data) => {
                   rating={item?.score}
                   //schedule_appointments={item.schedule_appointments}
                   isAvailable={true}
-                  onPress={() => navigation.navigate("DoctorDetails")}
+                  onPress={() => navigation.navigate("DoctorDetails", {medicInfo: JSON.stringify(item)})}
                 />
               )
             }}

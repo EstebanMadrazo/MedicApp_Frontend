@@ -31,11 +31,11 @@ const HorizontalDoctorCard = ({
                 style={styles.image}
             />
             {
-                isAvailable && isAvailable === true && (
+                /* isAvailable && isAvailable === true && (
                     <View style={styles.reviewContainer}>
-                        <Text style={styles.rating}>OPEN</Text>
+                        <Text style={styles.rating}>Listo</Text>
                     </View>
-                )
+                ) */
             }
             <View style={styles.columnContainer}>
                 <View style={styles.topViewContainer}>

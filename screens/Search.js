@@ -158,10 +158,10 @@ const Search = ({ navigation }) => {
                         <HorizontalDoctorCard
                           name={item?.given_name + " " + item?.family_name}
                           image={item?.profile_picture}
-                          //distance={item.distance}
-                          //price={item?.price}
+                          main_st={item.main_st}
+                          neighborhood={item.neighborhood}
                           consultationFee={item?.price}
-                          //hospital={item.hospital}
+                          office_state={item.office_state}
                           rating={item?.score}
                           //numReviews={item.numReviews}
                           isAvailable={true}
