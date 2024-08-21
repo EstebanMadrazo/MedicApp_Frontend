@@ -6,12 +6,13 @@ import { ScrollView } from 'react-native-virtualized-view';
 import { doctorReviews } from '../data';
 import ReviewCard from '../components/ReviewCard';
 import Button from '../components/Button';
+import Header from '../components/Header';
 
 const DoctorDetails = ({route, navigation }) => {
     const {medicInfo} = route.params
     const medic = JSON.parse(medicInfo)
 
-    console.log(medicInfo)
+    //console.log(medicInfo)
     /**
      * Render header
      */
@@ -30,12 +31,10 @@ const DoctorDetails = ({route, navigation }) => {
                                 tintColor: COLORS.black
                             }]} />
                     </TouchableOpacity>
-                    <Text style={[styles.headerTitle, {
-                        color: COLORS.black
-                    }]}>{medic.given_name} {medic.family_name}</Text>
+                    <Text style={[styles.headerTitle,]}>Conoce a tu Médico</Text>
                 </View>
                 <View style={styles.viewRight}>
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                         onPress={() => setIsFavourite(!isFavourite)}>
                         <Image
                             source={isFavourite ? icons.heart2 : icons.heart2Outline}
@@ -53,7 +52,7 @@ const DoctorDetails = ({route, navigation }) => {
                                 tintColor: COLORS.black
                             }]}
                         />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                 </View>
             </View>
         )
@@ -72,38 +71,37 @@ const DoctorDetails = ({route, navigation }) => {
 
         return (
             <View>
-                <View style={{ backgroundColor: COLORS.tertiaryWhite }}>
+                <View style={{ backgroundColor: COLORS.greyscale500 }}>
                     <View style={[styles.doctorCard, {
                         backgroundColor: COLORS.white,
                     }]}>
+                        {/* <Text style={[styles.doctorName, {
+                            color: COLORS.greyscale900
+                        }]}>{medic.given_name} {medic.family_name}</Text> */}
                         <Image
                             source={{
                                 uri:`${medic.profile_picture}`,
                                 Cache:'none'
                               }}
-                            resizeMode='contain'
+                            resizeMode='cover'
                             style={styles.doctorImage}
                         />
-                        <View>
-                            <Text style={[styles.doctorName, {
-                                color: COLORS.greyscale900
-                            }]}>{medic.given_name} {medic.family_name}</Text>
+                        <View style={{marginBottom:30}}>
                             <View style={[styles.separateLine, {
                                 backgroundColor: COLORS.grayscale200,
                             }]} />
+                            <Text style={styles.contentTitle}>Especialidades</Text>
                             <View style={{flexDirection:"row"}}>
                                 {medic.specialities.specialities.map((item) =>(
                                     <Text key={item.name} style={[styles.doctorSpeciality, {
                                         color: COLORS.greyScale800
-                                    }]}>{item.name}</Text>
+                                    }]}>{item.name} </Text>
                                 ))}
                             </View>
+                            <Text style={styles.contentTitle}>Ubicación</Text>
                             <Text style={[styles.doctorHospital, {
                                 color: COLORS.greyScale800
-                            }]}>{medic.main_st} | {medic.street_intersections}</Text>
-                            <Text style={[styles.doctorHospital, {
-                                color: COLORS.greyScale800
-                            }]}>{medic.neighborhood} | {medic.office_state}</Text>
+                            }]}> Calle {medic.main_st} | {medic.street_intersections} | {medic.neighborhood} | {medic.office_state}</Text>
                         </View>
                     </View>
                 </View>
@@ -207,9 +205,10 @@ const DoctorDetails = ({route, navigation }) => {
     return (
         <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                {renderHeader()}
+                {/* {renderHeader()} */}
+                <Header title={medic.given_name+ " " + medic.family_name} />
                 <ScrollView
-                    style={[styles.scrollView, { backgroundColor: COLORS.tertiaryWhite }]}
+                    style={[styles.scrollView, { backgroundColor: COLORS.greyscale500 }]}
                     showsVerticalScrollIndicator={false}>
                     {renderContent()}
                 </ScrollView>
@@ -221,7 +220,7 @@ const DoctorDetails = ({route, navigation }) => {
                     title="Agendar Cita"
                     filled
                     style={styles.btn}
-                    onPress={() => navigation.navigate("BookAppointment")}
+                    onPress={() => navigation.navigate("BookAppointment", {hp_uuid: medic.uuid})}
                 />
             </View>
         </SafeAreaView>
@@ -260,7 +259,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontFamily: "bold",
-        color: COLORS.black
+        color: COLORS.darkBlue
     },
     moreIcon: {
         width: 24,
@@ -278,21 +277,22 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     doctorCard: {
-        height: 242,
+        //height: 242,
         width: SIZES.width - 32,
         borderRadius: 32,
         backgroundColor: COLORS.white,
-        flexDirection: "row",
+        //flexDirection: "",
         alignItems: "center",
     },
     doctorImage: {
-        height: 110,
-        width: 110,
+        marginTop:20,
+        height: 150,
+        width: 150,
         borderRadius: 16,
         marginHorizontal: 16
     },
     doctorName: {
-        fontSize: 18,
+        fontSize: 22,
         color: COLORS.greyscale900,
         fontFamily: "bold"
     },
@@ -303,13 +303,13 @@ const styles = StyleSheet.create({
         marginVertical: 12
     },
     doctorSpeciality: {
-        fontSize: 14,
+        fontSize: 18,
         color: COLORS.greyScale800,
         fontFamily: "medium",
         marginBottom: 8
     },
     doctorHospital: {
-        fontSize: 14,
+        fontSize: 18,
         color: COLORS.greyScale800,
         fontFamily: "medium"
     },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     contentTitle: {
         fontSize: 20,
         fontFamily: "bold",
-        color: COLORS.greyscale900,
+        color: COLORS.darkBlue,
         marginVertical: 16
     },
     description: {
