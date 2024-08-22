@@ -434,7 +434,7 @@ const handleSearch = async (data) => {
           marginVertical: 5,
           borderColor: COLORS.primary,
           borderWidth: 1.3,
-          borderRadius: 24,
+          borderRadius: 8,
           marginRight: 12,
         }}
         onPress={() => toggleCategory(item.name)}>

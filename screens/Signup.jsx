@@ -397,8 +397,9 @@ const Signup = ({ navigation }) => {
                       open={isVisible}
                       limitDate={startDate}
                       onClose={() => { setIsVisible(false); } }
-                      onChangeStartDate={(value) => { onChange(value), setSelectedDate(value), setIsVisible(false), console.log(value.replace(/\//g, '-')); } }
-                      selectedDate={startDate} startDate={undefined}                    />
+                      onChangeStartDate={(value) => { onChange(value), setSelectedDate(value), setIsVisible(false) } }
+                      selectedDate={startDate} startDate={undefined}                    
+                      />
                   </>
                 )}
                 name="birthDate"

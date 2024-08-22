@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     icon: {
-        height: 26,
-        width: 26,
+        height: 30,
+        width: 30,
         marginRight: 16,
     },
     title: {

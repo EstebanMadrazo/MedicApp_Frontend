@@ -1,21 +1,109 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES, icons, images } from '../constants';
 import Header from '../components/Header';
 import { ScrollView } from 'react-native-virtualized-view';
 import Button from '../components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useSession } from '../ctx';
+import PayModal from '../components/PayModal';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import CheckoutScreen from '../components/StripeCheckout';
 
-const ReviewSummary = ({ navigation }) => {
+const ReviewSummary = ({ route, navigation }) => {
+  const {appointmentInfo, paymentMethod} = route.params
+  const medic = appointmentInfo.medic
+  const [info, setInfo] = useState()
+  const [token, setToken] = useState()
+  const [isLoading, setIsLoading] = useState(false)
+  const {session} = useSession();
+  const [user, setUser] = useState();
+  const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const date = new Date (appointmentInfo.date.replace(" ", "T"))
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  const dayName = days[date.getDay()]
+  const monthName = months[date.getMonth()]
+  const day = appointmentInfo.date.split(' ')[0].split('-')[2]
+  const year = appointmentInfo.date.split(' ')[0].split('-')[0]
+  const time = appointmentInfo.date.split(" ")[1]
+  const amount = medic.price
+  const [modalVisible, setModalVisible] = useState(false);
+  const  medicName = `${medic.given_name} ${medic.family_name}`
+
+  const getData = async () => {
+    try {
+      let value = await AsyncStorage.getItem('userInfo')
+      setInfo(JSON.parse(value))
+      let token = await AsyncStorage.getItem('tokens')
+      token = token?.substring(1, token?.length-1)
+      setToken(token)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const resUser = async() => {
+    try{
+      const responseInfo = await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/userInfo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization":'bearer ' + session,
+          "Refresher":'bearer ' + token,
+        },
+      })
+      setUser(responseInfo.data[0])
+      //console.log("response DATA: ",responseInfo.data[0])
+    }catch(e){
+      console.log("ERROR: ",e)
+    }
+  }
+
+  const handlePay = async () => {
+    if(paymentMethod == 'Paypal'){
+      payToPayPal()
+    }
+  }
+
+  const payToPayPal = async() => {
+      try{
+          const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/payments/create-order`,{
+              method:'POST',
+              headers:{
+                  'Content-Type':"application/json",
+              },
+              data:{amount:amount, hp:medicName, appointment_uuid:appointmentInfo.uuid}
+          })
+        console.log(resp.data)
+        Linking.openURL(resp.data.href)
+        navigation.replace('Main')
+      }catch(e){
+        console.log(e)
+      }   
+    } 
+
+  useEffect(() => {
+    getData()
+  }, [])
+
+  useEffect(() => {
+    if(token && session){
+      resUser()
+    }
+  }, [token, session])
 
   return (
     <SafeAreaView style={[styles.area, {
       backgroundColor: COLORS.tertiaryWhite
     }]}>
+      <PayModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
       <View style={[styles.container, {
         backgroundColor: COLORS.tertiaryWhite
       }]}>
-        <Header title="Review Summary" />
+        <Header title="Resumen de Cita" />
         <ScrollView showsVerticalScrollIndicator={false}>
 
           <View style={{
@@ -26,23 +114,30 @@ const ReviewSummary = ({ navigation }) => {
               backgroundColor: COLORS.white,
             }]}>
               <Image
-                source={images.doctor5}
-                resizeMode='contain'
+                source={{
+                  uri:`${medic.profile_picture}`,
+                  Cache:'none'
+                }}
+                resizeMode='cover'
                 style={styles.doctorImage}
               />
               <View>
                 <Text style={[styles.doctorName, {
                   color: COLORS.greyscale900
-                }]}>Dr.  Jenny Watson</Text>
+                }]}>{medic.given_name} {medic.family_name}</Text>
                 <View style={[styles.separateLine, {
                   backgroundColor: COLORS.grayscale200,
                 }]} />
-                <Text style={[styles.doctorSpeciality, {
-                  color: COLORS.greyScale800
-                }]}>Immunologists</Text>
+                <View style={{flexDirection:"row"}}>
+                    {medic.specialities.specialities.map((item) =>(
+                        <Text key={item.name} style={[styles.doctorSpeciality, {
+                            color: COLORS.greyScale800
+                        }]}>{item.name} </Text>
+                    ))}
+                </View>
                 <Text style={[styles.doctorHospital, {
                   color: COLORS.greyScale800
-                }]}>Christ Hospital in London, UK</Text>
+              }]}>{medic.main_st}, {medic.street_intersections}, {medic.neighborhood}, {medic.office_state}</Text>
               </View>
             </View>
           </View>
@@ -53,39 +148,39 @@ const ReviewSummary = ({ navigation }) => {
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Consultation Type</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>General</Text>
+              }]}>Tipo de Cita</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{appointmentInfo.isVideocall? 'Video llamada' : 'Cita presencial'}</Text>
             </View>
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Address</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>6993 Meadow Valley Terrace</Text>
+              }]}>Dirección</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{medic.main_st}, {medic.street_intersections}, {medic.neighborhood}, {medic.office_state}</Text>
             </View>
 
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Name</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>Daniel Austin</Text>
+              }]}>Nombre del Paciente</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{user?.given_name} {user?.family_name}</Text>
             </View>
-            <View style={styles.view}>
+            {/* <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
               }]}>Phone</Text>
               <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>+1 111 467 378 399</Text>
+            </View> */}
+            <View style={styles.view}>
+              <Text style={[styles.viewLeft, {
+                color: COLORS.grayscale700
+              }]}>Fecha Agendada</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{dayName} {day} de {monthName} del {year}</Text>
             </View>
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Booking Date</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>December 23, 2024</Text>
-            </View>
-            <View style={styles.view}>
-              <Text style={[styles.viewLeft, {
-                color: COLORS.grayscale700
-              }]}>Time</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>09:00 AM</Text>
+              }]}>Hora de Cita</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>A las {time} Hrs</Text>
             </View>
           </View>
 
@@ -95,14 +190,14 @@ const ReviewSummary = ({ navigation }) => {
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Amount</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>$20</Text>
+              }]}>Precio de Cita</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>${amount}</Text>
             </View>
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Duration (30 mins)</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>1 x $20</Text>
+              }]}>Duración de Cita</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{medic.duration.split(" ")[0]} (Hrs:Min)</Text>
             </View>
             <View style={[styles.separateLine, {
               backgroundColor: COLORS.grayscale200
@@ -111,7 +206,7 @@ const ReviewSummary = ({ navigation }) => {
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
               }]}>Total</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>$20</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>${amount}</Text>
             </View>
           </View>
 
@@ -120,28 +215,38 @@ const ReviewSummary = ({ navigation }) => {
           }]}>
             <View style={styles.cardLeft}>
               <Image
-                source={icons.creditCard}
+                source={paymentMethod == "Paypal"? icons.paypal : icons.creditCard}
                 resizeMode='contain'
                 style={styles.creditCard}
               />
               <Text style={[styles.creditCardNum, {
                 color: COLORS.greyscale900
               }]}>
-                •••• •••• •••• •••• 4679</Text>
+                {paymentMethod == "Paypal"? "PayPal" : "Tarjeta de Crédito"}
+              </Text>
             </View>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => navigation.navigate("AddNewCard")}>
               <Text style={styles.changeBtnText}>Change</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
         </ScrollView>
-        <Button
-          title="Continue"
-          onPress={() => navigation.navigate("EnterYourPIN")}
-          filled
-          style={styles.continueBtn}
-        />
+        {paymentMethod !== 'Paypal'? (
+            <StripeProvider publishableKey={process.env.STRIPE_KEY}>
+                <CheckoutScreen amount={amount} hp={medicName} appointment_uuid={appointmentInfo.uuid} />
+            </StripeProvider>
+          )
+          :
+          (
+            <Button
+              title="Pagar Cita"
+              onPress={handlePay}
+              filled
+              style={styles.continueBtn}
+            />
+          )
+        }
       </View>
     </SafeAreaView>
   )

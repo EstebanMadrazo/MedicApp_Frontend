@@ -1,15 +1,113 @@
 import { View, Text, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import { COLORS, SIZES, icons } from "../constants";
-import { Ionicons } from "@expo/vector-icons";
-import RNPickerSelect from 'react-native-picker-select';
+//import { Ionicons } from "@expo/vector-icons";
+//import RNPickerSelect from 'react-native-picker-select';
 import PackageItem from '../components/PackageItem';
 import Header from '../components/Header';
 import Button from '../components/Button';
+import { useSession } from "../ctx";
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const SelectPackage = ({ navigation }) => {
+
+const SelectPackage = ({ route, navigation }) => {
+    const {medicInfo, appointmentDate} = route.params
+    const [isVideocall, setIsVideoCall] = useState()
+    const {session} = useSession();
+    const [info, setInfo] = useState()
+    const [token, setToken] = useState()
+    const [isLoading, setIsLoading] = useState(false)
+
+    const getData = async () => {
+        try {
+          let value = await AsyncStorage.getItem('userInfo')
+          setInfo(JSON.parse(value))
+          let token = await AsyncStorage.getItem('tokens')
+          token = token?.substring(1, token?.length-1)
+          setToken(token)
+        } catch (e) {
+          console.log(e)
+        }
+      }
+
+    const createAppointment = async()=> {
+        setIsLoading(true)
+        const appointmentData = {
+          appointmentDate: appointmentDate,
+          healthProfUUID: medicInfo.hp_uuid,
+          isPrioritary:1,
+          total:medicInfo.price,
+          isVideocall:isVideocall
+        };
+        //console.log("appointmentData: ", appointmentData)
+        try{
+          const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/appointments/createAppointment`,{
+              method:'POST',
+              headers:{
+                  'Content-Type':"application/json",
+                  'Authorization': `bearer ${session}`,
+                  'refresher' : token
+              },
+              data:appointmentData
+          })
+          const successfulRoom = await handleRoom(resp.data.appointment)
+          if(!successfulRoom){
+            return
+          }
+          /* const uuid = resp.data.appointment
+          const total=doc.price
+          const  medic= `${doc.given_name} ${doc.family_name}` */
+          navigation.replace(
+            "PaymentMethods", 
+            {appointmentInfo: {
+                    uuid:resp.data.appointment,
+                    medic: medicInfo, 
+                    date: appointmentDate, 
+                    isVideocall:isVideocall
+                }}
+          )
+          //return {uuid: uuid, amount: total, hp: medic}
+      }catch(e){
+          console.log("Error",e.response.data)
+          setIsLoading(false)
+      }  
+    }
+
+    //crea y envia la informacion de una nueva room a la base de datos en base a la informacion de la cita
+    const handleRoom = async(uuid) => {
+        try{
+          //appointment.appointment.is_prioritary = 0 es cita sin paciente, is_prioritary = 1 es cita con paciente
+          const response = await axios(`${process.env.EXPO_PUBLIC_API_URL}/chat/storeRoom`, {
+           method: "POST",
+           headers:{
+            'Content-Type':"application/json",
+            'Authorization': `bearer ${session}`,
+            'refresher' : token
+          },
+           data:{
+            session_id: uuid,
+            patient_uuid: info.uuid,
+            hp_uuid: medicInfo.hp_uuid,
+            created_at: new Date (new Date(appointmentDate.replace(" ", "T")).getTime()),
+            expires_at: new Date (new Date(appointmentDate.replace(" ", "T")).getTime()+ 30 * 60 * 1000),
+            is_expired: false
+           }
+         })
+         return true
+        }catch(e){
+          console.log("Entro en Error")
+          console.log(e.response)
+          setIsLoading(false)
+          return false
+        }
+    }
+
+    useEffect(() => {
+        getData()
+    },[])
 
     const renderContent = () => {
         const [selectedItem, setSelectedItem] = useState(null);
@@ -21,12 +119,17 @@ const SelectPackage = ({ navigation }) => {
             } else {
                 // Otherwise, select the clicked item
                 setSelectedItem(itemTitle);
+                if(itemTitle === 'Video call'){
+                    setIsVideoCall(true)
+                }else{
+                    setIsVideoCall(false)
+                }
             }
         };
 
         return (
             <View>
-                <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Duration</Text>
+                {/* <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Duration</Text>
                 <View style={{
                     backgroundColor: COLORS.white,
                     paddingVertical: 12
@@ -60,13 +163,13 @@ const SelectPackage = ({ navigation }) => {
                             />
                         </View>
                     </View>
-                </View>
-                <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Package</Text>
+                </View> */}
+                <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Selecciona el tipo de cita</Text>
                 <View style={{
                     backgroundColor: COLORS.tertiaryWhite,
                     paddingTop: 12
                 }}>
-                    <PackageItem
+                    {/* <PackageItem
                         checked={selectedItem === 'Messaging'} // Check if it's the selected item
                         onPress={() => handleCheckboxPress('Messaging')} // Pass the item title
                         title="Messaging"
@@ -83,23 +186,23 @@ const SelectPackage = ({ navigation }) => {
                         price="40"
                         duration="30 mins"
                         icon={icons.telephone}
-                    />
+                    /> */}
                     <PackageItem
                         checked={selectedItem === 'Video call'}
                         onPress={() => handleCheckboxPress('Video call')}
-                        title="Video call"
-                        subtitle="Video call with Doctor"
-                        price="60"
-                        duration="30 mins"
+                        title="Video llamada"
+                        subtitle="Video llamada con el médico"
+                        price={medicInfo.price}
+                        duration={medicInfo.duration.split(" ")[0] +" (Hrs:Min)"}
                         icon={icons.videoCamera}
                     />
                     <PackageItem
                         checked={selectedItem === 'In Person'}
                         onPress={() => handleCheckboxPress('In Person')}
-                        title="In Person"
-                        subtitle="In person visit with Doctor"
-                        price="100"
-                        duration="30 mins"
+                        title="En persona"
+                        subtitle="Cita presencial con el médico"
+                        price={medicInfo.price}
+                        duration={medicInfo.duration.split(" ")[0] +" (Hrs:Min)"}
                         icon={icons.user}
                     />
                 </View>
@@ -110,7 +213,7 @@ const SelectPackage = ({ navigation }) => {
     return (
         <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                <Header title="Select Package" />
+                <Header title="Tipo de cita" />
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {renderContent()}
                 </ScrollView>
@@ -119,10 +222,13 @@ const SelectPackage = ({ navigation }) => {
                 backgroundColor: COLORS.white
             }]}>
                 <Button
-                    title="Next"
+                    title="Agendar"
                     filled
                     style={styles.btn}
-                    onPress={() => navigation.navigate("PatientDetails")}
+                    onPress={createAppointment}
+                    color={isVideocall === undefined? COLORS.disabled : COLORS.primary}
+                    disabled={isVideocall === undefined? true : false}
+                    isLoading={isLoading}
                 />
             </View>
         </SafeAreaView>
