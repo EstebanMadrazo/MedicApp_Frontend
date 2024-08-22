@@ -45,7 +45,7 @@ const BottomTabNavigation = () => {
                 }}>
                     <Tab.Screen
                         name="Home"
-                        component={Home}
+                        component={userInfo.userRole === 'Medic' ? Appointment : Home}
                         options={{
                             tabBarIcon: ({ focused }) => {
                                 return (
