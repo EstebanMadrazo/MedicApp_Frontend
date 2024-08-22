@@ -37,20 +37,19 @@ const UpcomingBooking = () => {
           role:data.userRole 
         }
       }) 
-      console.log('Appointments ',appointments.data.appointmentsInfo)
       const upcomingAppoint = []
       const today = new Date()
+      //Convierte utc en horario local
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset())
       for(let i = 0; i< appointments.data.appointmentsInfo.length; i++){
         //Convierte 2024-04-07 11:00:00 en 2024-04-07T17:00:00.000Z, es decir, de local a utc 
         const appointmentDate = new Date(appointments.data.appointmentsInfo[i].appointment.date)
 
         //Convierte de utc a local y despues compara si la fecha actual es menor a la fecha de la cita
-        if((today <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && appointments.data.appointmentsInfo[i].appointment.is_cancelled == 0){
+        if((today.getTime() <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && appointments.data.appointmentsInfo[i].appointment.is_cancelled == 0){
           upcomingAppoint.push(appointments.data.appointmentsInfo[i])
         }
       }
-      //setAppointments(appointments.data.appointmentsInfo)
-      console.log(upcomingAppoint.length)
       setAppointments(upcomingAppoint)
     }catch(err){
       console.err(err.response.data)
