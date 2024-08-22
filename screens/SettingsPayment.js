@@ -5,8 +5,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import PaymentMethodItemConnected from '../components/PaymentMethodItemConnected';
 import Button from '../components/Button';
+import useUserData from '../components/UserData';
 
 const SettingsPayment = ({ navigation }) => {
+    const {data, loading, error} = useUserData()
     /**
      * Render header
      */
@@ -46,7 +48,7 @@ const SettingsPayment = ({ navigation }) => {
                 <ScrollView
                     style={styles.settingsContainer}
                     showsVerticalScrollIndicator={false}>
-                    <PaymentMethodItemConnected
+                    {/*<PaymentMethodItemConnected
                         title="PayPal"
                         icon={icons.paypal}
                         onPress={() => console.log("PayPal")}
@@ -61,11 +63,11 @@ const SettingsPayment = ({ navigation }) => {
                         icon={icons.appleLogo}
                         onPress={() => console.log("Google Pay")}
                         tintColor={COLORS.black}
-                    />
+                    />*/}
                     <PaymentMethodItemConnected
-                        title="**** **** **** **** 4679"
+                        title={data?.bank}
                         icon={icons.mastercard}
-                        onPress={() => console.log("Credit Card")}
+                        onPress={() => navigation.navigate('AddNewCard')}
                     />
                 </ScrollView>
                 <Button

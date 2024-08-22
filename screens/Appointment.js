@@ -16,8 +16,8 @@ const Appointment = ({ navigation }) => {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'first', title: 'Upcoming' },
-    { key: 'second', title: 'Completed' },
+    { key: 'first', title: 'Proximas' },
+    { key: 'second', title: 'Completadas' },
     //{ key: 'third', title: 'Cancelled' }
   ]);
 
@@ -60,7 +60,7 @@ const Appointment = ({ navigation }) => {
           <Text style={[styles.headerTitle, {
             color: COLORS.greyscale900
           }]}>
-            My Appointment
+            Mis Citas
           </Text>
         </View>
         <TouchableOpacity>

@@ -12,6 +12,7 @@ import { getFormatedDate } from "react-native-modern-datepicker";
 import DatePickerModal from '../components/DatePickerModal';
 import Button from '../components/Button';
 import RNPickerSelect from 'react-native-picker-select';
+import { useRoute } from '@react-navigation/native';
 
 const isTestMode = true;
 
@@ -19,19 +20,21 @@ const initialState = {
   inputValues: {
     fullName: isTestMode ? 'John Doe' : '',
     email: isTestMode ? 'example@gmail.com' : '',
-    nickname: isTestMode ? "" : "",
+    familyName: isTestMode ? "" : "",
     phoneNumber: ''
   },
   inputValidities: {
     fullName: false,
     email: false,
-    nickname: false,
+    familyName: false,
     phoneNumber: false,
   },
   formIsValid: false,
 }
 
 const EditProfile = ({ navigation }) => {
+  const route = useRoute();
+  const {userInfo} = route.params || {}
   const [image, setImage] = useState(null);
   const [error, setError] = useState();
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
@@ -39,25 +42,25 @@ const EditProfile = ({ navigation }) => {
   const [selectedArea, setSelectedArea] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
-  const [selectedGender, setSelectedGender] = useState('');
-
+  const [selectedGender, setSelectedGender] = useState(userInfo.sex);
   const genderOptions = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Other', value: 'other' },
+    { label: 'Masculino', value: 'Masculino' },
+    { label: 'Femenino', value: 'Femenino' }
   ];
 
   const handleGenderChange = (value) => {
     setSelectedGender(value);
   };
 
-  const today = new Date();
+  const today = new Date(userInfo.birthdate);
+  console.log(today)
   const startDate = getFormatedDate(
-    new Date(today.setDate(today.getDate() + 1)),
+    new Date(today.setDate(today.getDate())).setMinutes(today.getMinutes() + today.getTimezoneOffset()),
     "YYYY/MM/DD"
   );
-
-  const [startedDate, setStartedDate] = useState("12/12/2023");
+  console.log("START DATE: ",startDate)
+  const [startedDate, setStartedDate] = useState(userInfo?.birthdate);
+  console.log(startedDate)
   const handleOnPressStartDate = () => {
     setOpenStartDatePicker(!openStartDatePicker);
   };
@@ -103,7 +106,7 @@ const EditProfile = ({ navigation }) => {
 
         setAreas(areaData);
         if (areaData.length > 0) {
-          let defaultData = areaData.filter((a) => a.code == "US");
+          let defaultData = areaData.filter((a) => a.code == "MX");
 
           if (defaultData.length > 0) {
             setSelectedArea(defaultData[0])
@@ -177,12 +180,14 @@ const EditProfile = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Edit Profile" />
+        <Header title="Editar Perfil" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ alignItems: "center", marginVertical: 12 }}>
             <View style={styles.avatarContainer}>
               <Image
-                source={image === null ? images.user1 : image}
+                source={{
+                  uri:`${userInfo.profile_picture}`
+                }}
                 resizeMode="cover"
                 style={styles.avatar} />
               <TouchableOpacity
@@ -198,25 +203,32 @@ const EditProfile = ({ navigation }) => {
           <View>
             <Input
               id="fullName"
+              value={userInfo.given_name}
               onInputChanged={inputChangedHandler}
               errorText={formState.inputValidities['fullName']}
               placeholder="Full Name"
               placeholderTextColor={COLORS.black}
             />
             <Input
-              id="nickname"
+              id="familyName"
+              value={userInfo.family_name}
               onInputChanged={inputChangedHandler}
-              errorText={formState.inputValidities['nickname']}
+              errorText={formState.inputValidities['familyName']}
               placeholder="Nickname"
               placeholderTextColor={COLORS.black}
             />
             <Input
               id="email"
+              value={userInfo.email}
               onInputChanged={inputChangedHandler}
               errorText={formState.inputValidities['email']}
               placeholder="Email"
               placeholderTextColor={COLORS.black}
-              keyboardType="email-address" />
+              keyboardType="email-address" 
+              editable = {false}
+              selectTextOnFocus={false}
+              />
+
             <View style={{
               width: SIZES.width - 32
             }}>
@@ -259,6 +271,7 @@ const EditProfile = ({ navigation }) => {
               {/* Phone Number Text Input */}
               <TextInput
                 style={styles.input}
+                value={userInfo.phone_number}
                 placeholder="Enter your phone number"
                 placeholderTextColor={COLORS.black}
                 selectionColor="#111"
@@ -267,7 +280,7 @@ const EditProfile = ({ navigation }) => {
             </View>
             <View>
               <RNPickerSelect
-                placeholder={{ label: 'Select', value: '' }}
+                placeholder={{ label: 'Seleccionar', value: '' }}
                 items={genderOptions}
                 onValueChange={(value) => handleGenderChange(value)}
                 value={selectedGender}
@@ -299,27 +312,27 @@ const EditProfile = ({ navigation }) => {
                 }}
               />
             </View>
-            <Input
+            {/*<Input
               id="occupation"
               onInputChanged={inputChangedHandler}
               errorText={formState.inputValidities['occupation']}
               placeholder="Occupation"
               placeholderTextColor={COLORS.black}
-            />
+            />*/}
           </View>
         </ScrollView>
       </View>
       <DatePickerModal
         open={openStartDatePicker}
         startDate={startDate}
-        selectedDate={startedDate}
+        selectedDate={userInfo.birthdate}
         onClose={() => setOpenStartDatePicker(false)}
         onChangeStartDate={(date) => setStartedDate(date)}
       />
       {RenderAreasCodesModal()}
       <View style={styles.bottomContainer}>
         <Button
-          title="Update"
+          title="Guardar"
           filled
           style={styles.continueButton}
           onPress={() => navigation.goBack()}

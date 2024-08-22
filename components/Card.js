@@ -8,7 +8,7 @@ const Card = ({ number, balance, date, onPress, containerStyle }) => {
             onPress={onPress}
             style={[styles.container, containerStyle]} >
             <View style={styles.headerContainer}>
-                <Text style={styles.header}>Payment Card</Text>
+                <Text style={styles.header}>Cuenta CLABE</Text>
                 <Image
                     source={images.cardLogo}
                     contentFit='contain'
@@ -16,10 +16,10 @@ const Card = ({ number, balance, date, onPress, containerStyle }) => {
                 />
             </View>
             <Text style={styles.cardNumber}>{number}</Text>
-            <View style={styles.footerContainer}>
+            {/* <View style={styles.footerContainer}>
                 <Text style={styles.balance}>${balance}</Text>
                 <Text style={styles.date}>{date}</Text>
-            </View>
+            </View> */}
             <Image
                 source={images.elipseCard}
                 contentFit='contain'

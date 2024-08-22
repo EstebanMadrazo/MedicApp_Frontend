@@ -50,34 +50,34 @@ const AddNewCard = ({ navigation }) => {
         <Card
           containerStyle={styles.card}
           number="•••• •••• •••• ••••"
-          balance="10000"
-          date="11/2029"
         />
         <View style={{ marginTop: 12 }}>
           <Text style={[commonStyles.inputHeader, {
             color: COLORS.black
-          }]}>Card Holder Name</Text>
+          }]}>Titular</Text>
           <Input
             id="creditCardHolderName"
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities['creditCardHolderName']}
-            placeholder="Vishal Khadok"
+            placeholder="Titular"
             placeholderTextColor={COLORS.black}
           />
         </View>
         <View style={{ marginTop: 12 }}>
           <Text style={[commonStyles.inputHeader, {
             color: COLORS.black
-          }]}>Card Number</Text>
+          }]}>Cuenta CLABE</Text>
           <Input
             id="creditCardNumber"
+            caretHidden={true}
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities['creditCardNumber']}
             placeholder="2143"
             placeholderTextColor={COLORS.black}
+            value = {formState['creditCardNumber']}
           />
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
+        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
           <View style={{ width: (SIZES.width - 32) / 2 - 10 }}>
             <Text style={[commonStyles.inputHeader, {
               color: COLORS.black
@@ -102,7 +102,7 @@ const AddNewCard = ({ navigation }) => {
               placeholderTextColor={COLORS.black}
             />
           </View>
-        </View>
+        </View> */}
       </View>
     )
   };

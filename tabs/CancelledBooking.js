@@ -14,7 +14,7 @@ const CancelledBooking = () => {
   const navigation = useNavigation();
 
   
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
       await getAppointments()
     }
@@ -51,7 +51,7 @@ const CancelledBooking = () => {
     }catch(err){
       console.err(err.response.data)
     }
-  }
+  }*/
   return (
     <View style={[styles.container, {
       backgroundColor: COLORS.tertiaryWhite

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
@@ -9,12 +9,59 @@ import SettingsItem from '../components/SettingsItem';
 import RBSheet from "react-native-raw-bottom-sheet";
 import Button from '../components/Button';
 import { useSession } from "../ctx";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import useUserData from '../components/UserData';
+import { CommonActions } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
   const refRBSheet = useRef();
-  const {session, signOut} = useSession();
+  const { session, signOut } = useSession(null);
+  const [tokens, setTokens] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
+  const { data, loading, error } = useUserData();
+  console.log(data)
+  /*useEffect(() => {
+    const fetchTokens = async () => {
+      const data = await getTokens()
+      setTokens(data)
+    }
+    fetchTokens()
+  }, [])
 
-  /**
+  useEffect(() => {
+    const fetchUserData = async () => {
+      await getUserInfo()
+    }
+    fetchUserData()
+  }, [tokens, session])
+
+  const getTokens = async () => {
+    const data = JSON.parse(await AsyncStorage.getItem('userInfo'))
+    console.log('DATA', data)
+    console.log('Refresh token', tokens.refreshToken)
+    console.log('TOKENS: ', tokens)
+    return data
+  }
+
+  const getUserInfo = async () => {
+    try {
+      const user = await axios({
+        url: `${process.env.EXPO_PUBLIC_API_URL}/user/userInfo`,
+        method: "POST",
+        headers: {
+          "Authorization": `bearer ${session}`,
+          "Refresher": `bearer ${data.refreshToken}`
+        }
+      })
+      console.log('USER: ', user.data)
+      setUserInfo(user.data)
+    } catch (err) {
+      console.err(err.response.data)
+    }
+  }*/
+
+  /** 
    * Render header
    */
   const renderHeader = () => {
@@ -28,7 +75,7 @@ const Profile = ({ navigation }) => {
           />
           <Text style={[styles.headerTitle, {
             color: COLORS.greyscale900
-          }]}>Profile</Text>
+          }]}>Perfil</Text>
         </View>
         <TouchableOpacity>
           <Image
@@ -62,7 +109,9 @@ const Profile = ({ navigation }) => {
       <View style={styles.profileContainer}>
         <View>
           <Image
-            source={image}
+            source={{
+              uri: `${data?.profile_picture}`
+            }}
             resizeMode='cover'
             style={styles.avatar}
           />
@@ -72,8 +121,8 @@ const Profile = ({ navigation }) => {
             <MaterialIcons name="edit" size={16} color={COLORS.white} />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Nathalie Erneson</Text>
-        <Text style={[styles.subtitle, { color: COLORS.greyscale900 }]}>nathalie_erneson@gmail.com</Text>
+        <Text style={[styles.title, { color: COLORS.greyscale900 }]}>{data?.given_name} {data?.family_name}</Text>
+        <Text style={[styles.subtitle, { color: COLORS.greyscale900 }]}>{data?.email}</Text>
       </View>
     )
   }
@@ -89,32 +138,47 @@ const Profile = ({ navigation }) => {
 
     return (
       <View style={styles.settingsContainer}>
-        <SettingsItem
+        {data?.role === 'Medic' ?
+        (<SettingsItem
           icon={icons.location2Outline}
-          name="Address"
+          name="Direccion"
           onPress={() => navigation.navigate("Address")}
-        />
+        />)
+        :
+        (<></>)
+        }
         <SettingsItem
           icon={icons.userOutline}
-          name="Edit Profile"
-          onPress={() => navigation.navigate("EditProfile")}
+          name="Editar Perfil"
+          onPress={() => navigation.navigate({
+            name: "EditProfile",
+            params: {
+              userInfo: data
+            }
+          })}
         />
-        <SettingsItem
+        {/*<SettingsItem
           icon={icons.bell2}
-          name="Notification"
+          name="Notificationes"
           onPress={() => navigation.navigate("SettingsNotifications")}
-        />
-        <SettingsItem
-          icon={icons.wallet2Outline}
-          name="Payment"
-          onPress={() => navigation.navigate("SettingsPayment")}
-        />
+        />*/}
+        {data?.role === 'Medic' ?
+          (
+            <SettingsItem
+              icon={icons.wallet2Outline}
+              name="Pagos"
+              onPress={() => navigation.navigate("SettingsPayment")}
+            />
+          )
+          :
+          (<></>)
+        }
         <SettingsItem
           icon={icons.shieldOutline}
-          name="Security"
+          name="Seguridad"
           onPress={() => navigation.navigate("SettingsSecurity")}
         />
-        <TouchableOpacity
+        {/*<TouchableOpacity
           onPress={() => navigation.navigate("SettingsLanguage")}
           style={styles.settingsItemContainer}>
           <View style={styles.leftContainer}>
@@ -166,13 +230,13 @@ const Profile = ({ navigation }) => {
               style={styles.switch}
             />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity>*/}
         <SettingsItem
           icon={icons.lockedComputerOutline}
-          name="Privacy Policy"
+          name="Politicas de Privacidad"
           onPress={() => navigation.navigate("SettingsPrivacyPolicy")}
         />
-        <SettingsItem
+        {/*<SettingsItem
           icon={icons.infoCircle}
           name="Help Center"
           onPress={() => navigation.navigate("HelpCenter")}
@@ -181,7 +245,7 @@ const Profile = ({ navigation }) => {
           icon={icons.people4}
           name="Invite Friends"
           onPress={() => navigation.navigate("InviteFriends")}
-        />
+        />*/}
         <TouchableOpacity
           onPress={() => refRBSheet.current.open()}
           style={styles.logoutContainer}>
@@ -195,7 +259,7 @@ const Profile = ({ navigation }) => {
             />
             <Text style={[styles.logoutName, {
               color: "red"
-            }]}>Logout</Text>
+            }]}>Cerrar Sesión</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -231,16 +295,16 @@ const Profile = ({ navigation }) => {
           }
         }}
       >
-        <Text style={styles.bottomTitle}>Logout</Text>
+        <Text style={styles.bottomTitle}>Cerrar Sesion</Text>
         <View style={[styles.separateLine, {
           backgroundColor: COLORS.grayscale200,
         }]} />
         <Text style={[styles.bottomSubtitle, {
           color: COLORS.black
-        }]}>Are you sure you want to log out?</Text>
+        }]}>Estas seguro de cerrar sesión?</Text>
         <View style={styles.bottomContainer}>
           <Button
-            title="Cancel"
+            title="Cancelar"
             style={{
               width: (SIZES.width - 32) / 2 - 8,
               backgroundColor: COLORS.tansparentPrimary,
@@ -251,10 +315,18 @@ const Profile = ({ navigation }) => {
             onPress={() => refRBSheet.current.close()}
           />
           <Button
-            title="Yes, Logout"
+            title="Sí, Cerrar Sesión"
             filled
             style={styles.logoutButton}
-            onPress={() => (refRBSheet.current.close(), navigation.push("Login"), signOut())}
+            onPress={async () => (
+              await signOut(), 
+              refRBSheet.current.close(), 
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                })
+            ))}
           />
         </View>
       </RBSheet>

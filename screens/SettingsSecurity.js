@@ -27,7 +27,7 @@ const SettingsSecurity = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Security" />
+        <Header title="Seguridad" />
         <ScrollView style={styles.scrollView}
           showsVerticalScrollIndicator={false}>
           <GlobalSettingsItem
@@ -35,7 +35,7 @@ const SettingsSecurity = ({ navigation }) => {
             isNotificationEnabled={isRememberMeEnabled}
             toggleNotificationEnabled={toggleRememberMe}
           />
-          <GlobalSettingsItem
+          {/*<GlobalSettingsItem
             title="Face ID"
             isNotificationEnabled={isFaceIDEnabled}
             toggleNotificationEnabled={toggleFaceID}
@@ -63,9 +63,9 @@ const SettingsSecurity = ({ navigation }) => {
             }}
             textColor={COLORS.primary}
             onPress={() => { navigation.navigate("ChangePIN") }}
-          />
+          />*/}
           <Button
-            title="Change Password"
+            title="Cambiar Contraseña"
             style={{
               backgroundColor: COLORS.tansparentPrimary,
               borderRadius: 32,
@@ -75,7 +75,7 @@ const SettingsSecurity = ({ navigation }) => {
             textColor={COLORS.primary}
             onPress={() => { navigation.navigate("ChangePassword") }}
           />
-          <Button
+          {/*<Button
             title="Change Email"
             style={{
               backgroundColor: COLORS.tansparentPrimary,
@@ -85,7 +85,7 @@ const SettingsSecurity = ({ navigation }) => {
             }}
             textColor={COLORS.primary}
             onPress={() => { navigation.navigate("ChangeEmail") }}
-          />
+          />*/}
         </ScrollView>
       </View>
     </SafeAreaView>

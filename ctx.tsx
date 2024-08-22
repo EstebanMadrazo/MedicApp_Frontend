@@ -36,6 +36,7 @@ export function SessionProvider(props: PropsWithChildren) {
         signOut: async () => {
           setSession(null);
           await AsyncStorage.removeItem('tokens');
+          await AsyncStorage.removeItem('userInfo');
         },
         session,
         isLoading,

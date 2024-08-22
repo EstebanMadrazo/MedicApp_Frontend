@@ -27,7 +27,7 @@ const CompletedBooking = () => {
     try{
       
       const appointments = await axios({
-        url:"https://premed.one/api/v1/appointments/appointmentInfo",
+        url:`${process.env.EXPO_PUBLIC_API_URL}/appointments/appointmentInfo`,
         method:"GET",
         params:{
           uuid:data.uuid,

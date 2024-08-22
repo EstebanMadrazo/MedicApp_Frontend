@@ -62,10 +62,10 @@ const ChangePassword = ({ navigation }) => {
                 resizeMode='contain'
                 style={styles.modalIllustration}
               />
-              <Text style={styles.modalTitle}>Congratulations!</Text>
+              <Text style={styles.modalTitle}>Felicidades!</Text>
               <Text style={[styles.modalSubtitle, {
                 color: COLORS.greyscale600,
-              }]}>Your account is ready to use. You will be redirected to the Home page in a few seconds..</Text>
+              }]}>Tu contraseña ha sido restablecida.</Text>
               <Button
                 title="Continue"
                 filled
@@ -88,7 +88,7 @@ const ChangePassword = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Change Password" />
+        <Header title="Cambiar Contraseña" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.logoContainer}>
             <Image
@@ -97,13 +97,13 @@ const ChangePassword = ({ navigation }) => {
               style={styles.success}
             />
           </View>
-          <Text style={[styles.title, { color: COLORS.black }]}>Reset Password</Text>
+          <Text style={[styles.title, { color: COLORS.black }]}>Restablecer Contraseña</Text>
           <Input
             onInputChanged={inputChangedHandler}
             errorText={formState.inputValidities['password']}
             autoCapitalize="none"
             id="password"
-            placeholder="Old Password"
+            placeholder="Anterior Contraseña"
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
@@ -113,7 +113,7 @@ const ChangePassword = ({ navigation }) => {
             errorText={formState.inputValidities['newPassword']}
             autoCapitalize="none"
             id="newPassword"
-            placeholder="New Password"
+            placeholder="Nueva Contraseña"
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
@@ -123,7 +123,7 @@ const ChangePassword = ({ navigation }) => {
             errorText={formState.inputValidities['confirmNewPassword']}
             autoCapitalize="none"
             id="confirmNewPassword"
-            placeholder="Confirm New Password"
+            placeholder="Confirmar Nueva Contraseña"
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
@@ -137,7 +137,7 @@ const ChangePassword = ({ navigation }) => {
                 onValueChange={setChecked}
               />
               <View style={{ flex: 1 }}>
-                <Text style={[styles.privacy, { color: COLORS.black }]}>Remenber me</Text>
+                <Text style={[styles.privacy, { color: COLORS.black }]}>Recordarme</Text>
               </View>
             </View>
           </View>

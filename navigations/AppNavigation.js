@@ -34,21 +34,38 @@ const Stack = createNativeStackNavigator();
 const AppNavigation = () => {
   const [isFirstLaunch, setIsFirstLaunch] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [userInfo, setUserInfo] = useState(null)
 
   useEffect(() => {
     const checkIfFirstLaunch = async () => {
       try {
         const value = await AsyncStorage.getItem('alreadyLaunched')
+        
+        console.log('Launch value: ',value)
         if (value === null) {
           await AsyncStorage.setItem('alreadyLaunched', 'true')
           setIsFirstLaunch(true)
         } else {
           setIsFirstLaunch(false)
         }
+        await checkIfLogin()
       } catch (error) {
+        console.log(error)
         setIsFirstLaunch(false)
       }
       setIsLoading(false) // Set loading state to false once the check is complete
+    }
+
+    const checkIfLogin = async() => {
+      try{
+        const info = await AsyncStorage.getItem('userInfo')
+        console.log('INFO ', info)
+        if(info !== null){
+          setUserInfo(info)
+        }
+      }catch(error){
+        console.log(error)
+      }
     }
 
     checkIfFirstLaunch()
@@ -64,7 +81,7 @@ const AppNavigation = () => {
         screenOptions={{ headerShown: false }}
         // replace the second onboaring1 with login in order to make the user not to see the onboarding 
         // when login the next time
-        initialRouteName={isFirstLaunch ? 'Onboarding1' : 'Login'}>
+        initialRouteName={isFirstLaunch ? 'Onboarding1' : userInfo ? 'Main' : 'Login'}>
         <Stack.Screen name="Onboarding1" component={Onboarding1} />
         <Stack.Screen name="Onboarding2" component={Onboarding2} />
         <Stack.Screen name="Onboarding3" component={Onboarding3} />

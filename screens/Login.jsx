@@ -89,7 +89,7 @@ const Login = ({ navigation }) => {
           signIn(responseData.token);
           console.log("Response Token: ",responseData.token)
           console.log(responseData)
-          if (responseData.userRole == 'Medic') {
+          if (responseData?.userRole == 'Medic') {
             console.log("Is first login: ", responseData.firstLogin )
             if(responseData.firstLogin === 1){
               //setFirstLogin(true)
