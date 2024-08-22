@@ -21,11 +21,12 @@ const BookAppointment = ({ route, navigation }) => {
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset())
     const startDate = getFormatedDate(today,"YYYY/MM/DD");
     const [selectedDate, setSelectedDate] = useState(startDate);
-    const [MedicInfo, setMedicInfo] = useState()
+    const [medicInfo, setMedicInfo] = useState()
     const {session} = useSession();
     const [info, setInfo] = useState()
     const [token, setToken] = useState()
     const [availableHours, setAvailableHours] = useState()
+    const [isLoading, setIsLoading] = useState(false)
 
     console.log(availableHours)
 
@@ -121,18 +122,18 @@ const BookAppointment = ({ route, navigation }) => {
                             startDate={startDate}
                             selectedDate={selectedDate}
                             onClose={() => setOpenStartDatePicker(false)}
-                            onChangeStartDate={(date) => setSelectedDate(date)}
+                            onChangeStartDate={(date) => {setSelectedDate(date), setSelectedHour(null)}}
                         />
                     </View>
                     <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Seleccione la hora</Text>
                     {availableHours !== undefined ? (
                         <FlatList
-                        data={availableHours}
-                        renderItem={renderHourItem}
-                        numColumns={3}
-                        keyExtractor={(item) => item?.hour}
-                        showsVerticalScrollIndicator={false}
-                        style={{ marginVertical: 12 }}
+                            data={availableHours}
+                            renderItem={renderHourItem}
+                            numColumns={3}
+                            keyExtractor={(item) => item?.hour}
+                            showsVerticalScrollIndicator={false}
+                            style={{ marginVertical: 12 }}
                         />
                     ) 
                     : 
@@ -151,7 +152,19 @@ const BookAppointment = ({ route, navigation }) => {
                     title="Siguiente"
                     filled
                     style={styles.btn}
-                    onPress={() => navigation.navigate("SelectPackage")}
+                    onPress={() => {
+                            navigation.replace(
+                                "SelectPackage", 
+                                {
+                                    medicInfo:medicInfo, 
+                                    appointmentDate: selectedDate.replace(/\//g, '-') + ' ' + selectedHour
+                                })
+                            setIsLoading(true)
+                        }
+                    }
+                    disabled={selectedHour === null? true: false}
+                    color={selectedHour === null? COLORS.disabled: COLORS.primary}
+                    isLoading={isLoading}
                 />
             </View>
         </SafeAreaView>
@@ -223,7 +236,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     btn: {
-        width: SIZES.width - 32
+        width: SIZES.width - 32,
     }
 })
 

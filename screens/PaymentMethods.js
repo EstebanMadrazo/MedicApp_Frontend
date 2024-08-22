@@ -8,9 +8,10 @@ import PaymentMethodItem from '../components/PaymentMethodItem';
 import Button from '../components/Button';
 
 // Payment Methods Connected
-const PaymentMethods = ({ navigation }) => {
+const PaymentMethods = ({ route, navigation }) => {
+  const {appointmentInfo} = route.params
   const [selectedItem, setSelectedItem] = useState(null);
-
+  //console.log(selectedItem)
   // Handle checkbox
   const handleCheckboxPress = (itemTitle) => {
     if (selectedItem === itemTitle) {
@@ -25,12 +26,13 @@ const PaymentMethods = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-        <Header title="Payment Methods" />
+        <Header title="Métodos de Pago"/>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={[styles.title, {
             color: COLORS.greyscale900
-          }]}>Select the payment method
-            you want to use.</Text>
+          }]}>
+            Selecciona el método de pago que deseas usar para pagar la cita.
+          </Text>
           <PaymentMethodItem
             checked={selectedItem === 'Paypal'}
             onPress={() => handleCheckboxPress('Paypal')}
@@ -38,25 +40,13 @@ const PaymentMethods = ({ navigation }) => {
             icon={icons.paypal}
           />
           <PaymentMethodItem
-            checked={selectedItem === 'Google Pay'}
-            onPress={() => handleCheckboxPress('Google Pay')}
-            title="Google Pay"
-            icon={icons.google}
-          />
-          <PaymentMethodItem
-            checked={selectedItem === 'Apple Pay'}
-            onPress={() => handleCheckboxPress('Apple Pay')}
-            title="Apple Pay"
-            icon={icons.apple}
-            tintColor={COLORS.black}
-          />
-          <PaymentMethodItem
-            checked={selectedItem === 'Credit Card'}
-            onPress={() => handleCheckboxPress('Credit Card')}
-            title="•••• •••• •••• •••• 4679"
+            checked={selectedItem === 'CreditCard'}
+            onPress={() => handleCheckboxPress('CreditCard')}
+            //title="•••• •••• •••• •••• 4679"
+            title="Tarjeta de Crédito"
             icon={icons.creditCard}
           />
-          <Button
+          {/* <Button
             title="Add New Card"
             onPress={() => { navigation.navigate("AddNewCard") }}
             style={{
@@ -66,13 +56,20 @@ const PaymentMethods = ({ navigation }) => {
               borderColor: COLORS.tansparentPrimary
             }}
             textColor={COLORS.primary}
-          />
+          /> */}
         </ScrollView>
         <Button
-          title="Continue"
+          title="Continuar"
           filled
           style={styles.continueBtn}
-          onPress={() => { navigation.navigate("ReviewSummary") }}
+          onPress={() => { 
+            navigation.navigate(
+              "ReviewSummary", 
+              {appointmentInfo: appointmentInfo, paymentMethod: selectedItem}
+            )  
+          }}
+          color={selectedItem === null? COLORS.disabled : COLORS.primary}
+          disabled={selectedItem === null? true : false}
         />
       </View>
     </SafeAreaView>
@@ -101,7 +98,6 @@ const styles = StyleSheet.create({
     right: 16,
     width: SIZES.width - 32,
     borderRadius: 32,
-    backgroundColor: COLORS.primary,
   }
 })
 
