@@ -11,6 +11,7 @@ import Button from '../components/Button';
 import axios from 'axios';
 import { useSession } from "../ctx";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NotAvailableDayCard from '../components/NotAvailableDayCard';
 
 const BookAppointment = ({ route, navigation }) => {
     const {hp_uuid} = route.params
@@ -24,7 +25,7 @@ const BookAppointment = ({ route, navigation }) => {
     const {session} = useSession();
     const [info, setInfo] = useState()
     const [token, setToken] = useState()
-    const [availableHours, setAvailableHours] = useState([])
+    const [availableHours, setAvailableHours] = useState()
 
     console.log(availableHours)
 
@@ -86,7 +87,7 @@ const BookAppointment = ({ route, navigation }) => {
       }, [])
 
       useEffect(() => {
-        if(token && session && selectedDate){
+        if(selectedDate){
             resMedicAvailability()
         }
       }, [selectedDate])
@@ -124,21 +125,30 @@ const BookAppointment = ({ route, navigation }) => {
                         />
                     </View>
                     <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Seleccione la hora</Text>
-                    <FlatList
+                    {availableHours !== undefined ? (
+                        <FlatList
                         data={availableHours}
                         renderItem={renderHourItem}
                         numColumns={3}
                         keyExtractor={(item) => item?.hour}
                         showsVerticalScrollIndicator={false}
                         style={{ marginVertical: 12 }}
-                    />
+                        />
+                    ) 
+                    : 
+                    (
+                        <View>
+                            <NotAvailableDayCard/>
+                        </View>
+                    )}
+                    
                 </ScrollView>
             </View>
             <View style={[styles.bottomContainer, {
                 backgroundColor: COLORS.white
             }]}>
                 <Button
-                    title="Next"
+                    title="Siguiente"
                     filled
                     style={styles.btn}
                     onPress={() => navigation.navigate("SelectPackage")}

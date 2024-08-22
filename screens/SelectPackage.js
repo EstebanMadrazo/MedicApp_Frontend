@@ -26,7 +26,7 @@ const SelectPackage = ({ navigation }) => {
 
         return (
             <View>
-                <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Duration</Text>
+                {/* <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Duration</Text>
                 <View style={{
                     backgroundColor: COLORS.white,
                     paddingVertical: 12
@@ -60,13 +60,13 @@ const SelectPackage = ({ navigation }) => {
                             />
                         </View>
                     </View>
-                </View>
-                <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Package</Text>
+                </View> */}
+                <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Selecciona el tipo de cita</Text>
                 <View style={{
                     backgroundColor: COLORS.tertiaryWhite,
                     paddingTop: 12
                 }}>
-                    <PackageItem
+                    {/* <PackageItem
                         checked={selectedItem === 'Messaging'} // Check if it's the selected item
                         onPress={() => handleCheckboxPress('Messaging')} // Pass the item title
                         title="Messaging"
@@ -83,12 +83,12 @@ const SelectPackage = ({ navigation }) => {
                         price="40"
                         duration="30 mins"
                         icon={icons.telephone}
-                    />
+                    /> */}
                     <PackageItem
                         checked={selectedItem === 'Video call'}
                         onPress={() => handleCheckboxPress('Video call')}
-                        title="Video call"
-                        subtitle="Video call with Doctor"
+                        title="Video llamada"
+                        subtitle="Video llamada con el médico"
                         price="60"
                         duration="30 mins"
                         icon={icons.videoCamera}
@@ -96,8 +96,8 @@ const SelectPackage = ({ navigation }) => {
                     <PackageItem
                         checked={selectedItem === 'In Person'}
                         onPress={() => handleCheckboxPress('In Person')}
-                        title="In Person"
-                        subtitle="In person visit with Doctor"
+                        title="En persona"
+                        subtitle="Cita presencial con el médico"
                         price="100"
                         duration="30 mins"
                         icon={icons.user}
@@ -110,7 +110,7 @@ const SelectPackage = ({ navigation }) => {
     return (
         <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                <Header title="Select Package" />
+                <Header title="Tipo de cita" />
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {renderContent()}
                 </ScrollView>
@@ -119,7 +119,7 @@ const SelectPackage = ({ navigation }) => {
                 backgroundColor: COLORS.white
             }]}>
                 <Button
-                    title="Next"
+                    title="Pagar cita"
                     filled
                     style={styles.btn}
                     onPress={() => navigation.navigate("PatientDetails")}

@@ -13,11 +13,11 @@ const NotFoundCard = () => {
       />
       <Text style={[styles.title, {
         color: COLORS.black
-      }]}>Not Found</Text>
+      }]}>Sin resultados</Text>
       <Text style={[styles.subtitle, {
         color: COLORS.black
-      }]}>Sorry, the keyword you entered cannot be found,
-        please check again or search with another keyword.</Text>
+      }]}>Lo sentimos, la palabra clave que ha introducido no se encuentra,
+        por favor, compruebe de nuevo o busque con otra palabra clave.</Text>
     </View>
   )
 };
