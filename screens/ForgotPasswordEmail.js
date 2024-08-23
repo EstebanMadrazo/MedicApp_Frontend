@@ -93,7 +93,7 @@ const ForgotPasswordEmail = ({ navigation }) => {
                         keyboardType="email-address"
                         value={account}
                     />
-                    <View style={styles.checkBoxContainer}>
+                    {/* <View style={styles.checkBoxContainer}>
                         <View style={{ flexDirection: 'row' }}>
                             <Checkbox
                                 style={styles.checkbox}
@@ -107,7 +107,7 @@ const ForgotPasswordEmail = ({ navigation }) => {
                                 }]}>Recuerdame</Text>
                             </View>
                         </View>
-                    </View>
+                    </View> */}
                     <Button
                         title="Recuperar Contraseña"
                         filled
@@ -116,21 +116,21 @@ const ForgotPasswordEmail = ({ navigation }) => {
                     />
                     <TouchableOpacity
                         onPress={() => navigation.navigate("Login")}>
-                        <Text style={styles.forgotPasswordBtnText}>¿Recuerdas tu contraseña?</Text>
+                        <Text style={styles.forgotPasswordBtnText}>Regresar al Login</Text>
                     </TouchableOpacity>
                     <View>
                     </View>
-                </ScrollView>
-                <View style={styles.bottomContainer}>
-                    <Text style={[styles.bottomLeft, {
-                        color: COLORS.black
-                    }]}>¿No tienes una cuenta?</Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate("Signup")}>
-                        <Text style={styles.bottomRight}>{"  "}Regístrate</Text>
-                    </TouchableOpacity>
+                    <View style={styles.bottomContainer}>
+                        <Text style={[styles.bottomLeft, {
+                            color: COLORS.black
+                        }]}>¿No tienes una cuenta?</Text>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("Signup")}>
+                            <Text style={styles.bottomRight}>{"  "}Regístrate</Text>
+                        </TouchableOpacity>
+                    </View>
+                    </ScrollView>
                 </View>
-            </View>
         </SafeAreaView>
     )
 };
@@ -207,11 +207,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        marginVertical: 18,
-        position:"absolute",
-        bottom: 12,
-        right: 0,
-        left: 0,
+        marginTop:"50%"
     },
     bottomLeft: {
         fontSize: 16,

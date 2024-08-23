@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { SIZES, COLORS, icons } from '../constants';
+import { SIZES, COLORS, icons, images } from '../constants';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from "@expo/vector-icons";
 import { cancelledAppointments } from '../data';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import NotFoundCard from '../components/NotFoundCard';
 
 const CancelledBooking = () => {
   const [bookings, setBookings] = useState(cancelledAppointments);
@@ -14,7 +15,7 @@ const CancelledBooking = () => {
   const navigation = useNavigation();
 
   
-  /*useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       await getAppointments()
     }
@@ -27,7 +28,7 @@ const CancelledBooking = () => {
     console.log(data)
     try{
       
-      const appointments = await axios({
+      const response = await axios({
         url:"https://premed.one/api/v1/appointments/appointmentInfo",
         method:"GET",
         params:{
@@ -35,97 +36,34 @@ const CancelledBooking = () => {
           role:data.userRole 
         }
       }) 
-      console.log('Appointments ',appointments.data.appointmentsInfo)
+      console.log('Appointments ',response.data.appointmentsInfo)
       const cancelledAppoint = []
       const today = new Date()
-      console.log(appointments.data.appointmentsInfo.length)
-      for(let i = 0; i< appointments.data.appointmentsInfo.length; i++){
-        console.log(appointments.data.appointmentsInfo[i].appointment.uuid)
-        if(appointments.data.appointmentsInfo[i].appointment.is_cancelled == 1){
-          cancelledAppoint.push(appointments.data.appointmentsInfo[i])
+      console.log(response.data.appointmentsInfo.length)
+      for(let i = 0; i< response.data.appointmentsInfo.length; i++){
+        console.log(response.data.appointmentsInfo[i].appointment.uuid)
+        if(response.data.appointmentsInfo[i].appointment.is_verified == 0){
+          cancelledAppoint.push(response.data.appointmentsInfo[i])
         }
       }
       //setAppointments(appointments.data.appointmentsInfo)
-      console.log(cancelledAppoint.length)
+      console.log("cancelledAppoint: ",cancelledAppoint)
       setAppointments(cancelledAppoint)
     }catch(err){
       console.err(err.response.data)
     }
-  }*/
+  }
   return (
     <View style={[styles.container, {
       backgroundColor: COLORS.tertiaryWhite
     }]}>
-      {/*
-      <FlatList
-        data={bookings}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={[styles.cardContainer, {
-            backgroundColor: COLORS.white,
-          }]}>
-            <View style={styles.detailsViewContainer}>
-              <View style={styles.detailsContainer}>
-                <View>
-                  <Image
-                    source={item.image}
-                    resizeMode='cover'
-                    style={styles.serviceImage}
-                  />
-                  <View style={styles.reviewContainer}>
-                    <FontAwesome name="star" size={12} color="orange" />
-                    <Text style={styles.rating}>{item.rating}</Text>
-                  </View>
-                </View>
-                <View style={styles.detailsRightContainer}>
-                  <Text style={[styles.name, {
-                    color: COLORS.greyscale900
-                  }]}>{item.doctor}</Text>
-                  <View style={styles.priceContainer}>
-                    <Text style={[styles.address, {
-                      color: COLORS.grayscale700,
-                    }]}>{item.package} -  </Text>
-                    <View style={styles.statusContainer}>
-                      <Text style={styles.statusText}>{item.status}</Text>
-                    </View>
-                  </View>
-                  <Text style={[styles.address, {
-                    color: COLORS.grayscale700,
-                  }]}>{item.date}</Text>
-                </View>
-              </View>
-              <TouchableOpacity style={styles.iconContainer}>
-                <Image
-                  source={
-                    item.package === "Messaging"
-                      ? icons.chatBubble2
-                      : item.package === "Video Call"
-                        ? icons.videoCamera
-                        : item.package === "Voice Call"
-                          ? icons.telephone
-                          : null // Add a fallback in case none of the conditions match
-                  }
-                  resizeMode='contain'
-                  style={styles.chatIcon}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={[styles.separateLine, {
-              marginVertical: 10,
-              backgroundColor: COLORS.grayscale200,
-            }]} />
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("ReviewSummary")}
-                style={styles.receiptBtn}>
-                <Text style={styles.receiptBtnText}>View</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        )}
-      />*/}
-      <FlatList
+      {appointments.length == 0? 
+      (
+        <NotFoundCard text={" "} title={"No tiene citas pendientes por pagar"} image={icons.creditCard}/>
+      ) 
+      : 
+      (
+        <FlatList
         data={appointments}
         keyExtractor={item => item.appointment.uuid}
         showsVerticalScrollIndicator={false}
@@ -151,13 +89,16 @@ const CancelledBooking = () => {
                 <View style={styles.detailsRightContainer}>
                   <Text style={[styles.name, {
                     color: COLORS.greyscale900
-                  }]}>{item.doctor}</Text>
+                  }]}>{item.appointment.external_patient ? item.appointment.external_patient : item.info.given_name}</Text>
+                  <Text style={[styles.name, {
+                    color: COLORS.greyscale900
+                  }]}>{item.appointment.external_patient ?  "PACIENTE EXTERNO" : item.info.family_name}</Text>
                   <View style={styles.priceContainer}>
                     <Text style={[styles.address, {
                       color: COLORS.grayscale700,
                     }]}>{item.appointment.is_video_call === 1 ? "Virtual":"Presencial"} -  </Text>
                     <View style={styles.statusContainer}>
-                      <Text style={styles.statusText}>{item.appointment.is_cancelled == 1 ? "Cancelado":""}</Text>
+                      <Text style={styles.statusText}>{item.appointment.is_cancelled == 0 ? "No pagado":""}</Text>
                     </View>
                   </View>
                   <Text style={[styles.address, {
@@ -184,14 +125,23 @@ const CancelledBooking = () => {
             }]} />
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                onPress={() => navigation.navigate("ReviewSummary")}
+                onPress={() => navigation.navigate(
+                  "PaymentMethods", 
+                  {appointmentInfo: {
+                          uuid:item.appointment.uuid,
+                          medic: item.info, 
+                          date: item.appointment.date, 
+                          isVideocall:item.appointment.is_videocall
+                      }}
+                )}
                 style={styles.receiptBtn}>
-                <Text style={styles.receiptBtnText}>View</Text>
+                <Text style={styles.receiptBtnText}>Pagar cita</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
       />
+      )}
     </View>
   )
 };
@@ -223,7 +173,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 24,
     borderRadius: 6,
-    backgroundColor: "transparent",
+    backgroundColor: COLORS.red,
     alignItems: "center",
     justifyContent: "center",
     borderColor: COLORS.red,
@@ -231,7 +181,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 10,
-    color: COLORS.red,
+    color: COLORS.white,
     fontFamily: "medium",
   },
   separateLine: {

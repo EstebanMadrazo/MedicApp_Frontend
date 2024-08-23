@@ -1,25 +1,50 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { CancelledBooking, CompletedBooking, UpcomingBooking } from '../tabs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const renderScene = SceneMap({
+const renderPatientScene = SceneMap({
   first: UpcomingBooking,
   second: CompletedBooking,
-  //third: CancelledBooking
+  third: CancelledBooking
+});
+
+const renderMedicScene = SceneMap({
+  first: UpcomingBooking,
+  second: CompletedBooking,
 });
 
 const Appointment = ({ navigation }) => {
   const layout = useWindowDimensions();
-
+  const [userRole, setUserRole] = useState()
   const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'first', title: 'Proximas' },
+  const [routesPatient] = React.useState([
+    { key: 'first', title: 'Próximas' },
     { key: 'second', title: 'Completadas' },
-    //{ key: 'third', title: 'Cancelled' }
+    { key: 'third', title: 'No Pagadas' }
   ]);
+
+  const [routesMedic] = React.useState([
+    { key: 'first', title: 'Próximas' },
+    { key: 'second', title: 'Completadas' },
+  ]);
+
+  const getData = async () => {
+    try {
+      let value = await AsyncStorage.getItem('userInfo')
+      let userInfo = (JSON.parse(value))
+      setUserRole(userInfo.userRole)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+  }, [])
 
   const renderTabBar = (props) => (
     <TabBar
@@ -52,7 +77,7 @@ const Appointment = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => navigation.goBack()}>
             <Image
-              source={images.logo}
+              source={images.premedLogo}
               resizeMode='contain'
               style={styles.logoIcon}
             />
@@ -81,8 +106,8 @@ const Appointment = ({ navigation }) => {
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
         {renderHeader()}
         <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
+          navigationState={{ index, routes: userRole == "Medic"? routesMedic : routesPatient }}
+          renderScene={userRole == "Medic"? renderMedicScene :  renderPatientScene}
           onIndexChange={setIndex}
           initialLayout={{ width: layout.width }}
           renderTabBar={renderTabBar}

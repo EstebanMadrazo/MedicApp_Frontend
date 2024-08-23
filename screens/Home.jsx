@@ -10,6 +10,7 @@ import HorizontalDoctorCard from '../components/HorizontalDoctorCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSession } from "../ctx";
 import axios from 'axios';
+import NotFoundCard from '../components/NotFoundCard';
 
 const Home = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -21,6 +22,7 @@ const Home = ({ navigation }) => {
   const [user, setUser] = useState();
   const [medics, setMedics] = useState([])
   const [seeAll, setSeeAll] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
  
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
@@ -233,7 +235,7 @@ const handleSearch = async (data) => {
       {
         id: "0",
         name: "Cercanos",
-        icon: icons.category,
+        icon: icons.location4,
         iconColor: "rgba(36, 107, 253, 1)",
         backgroundColor: "rgba(36, 107, 253, .12)",
         onPress: null
@@ -390,6 +392,58 @@ const handleSearch = async (data) => {
   */
   const renderCategories = () => {
 
+    const renderCategoryItem = ({ item }) => (
+      <Category
+        name={item.name}
+        icon={item.icon}
+        iconColor={selectedCategories.includes(item.name) ? COLORS.white : item.iconColor}
+        backgroundColor={selectedCategories.includes(item.name) ? COLORS.primary : item.backgroundColor}
+        onPress={() => toggleCategory(item.name)}
+      />
+    );
+
+    const toggleCategory = async (category) => {
+      const updatedCategories = [...selectedCategories];
+      const index = updatedCategories.indexOf(category);
+      let temp
+      let states = []
+      console.log("Category: ", category)
+      if (updatedCategories.includes(category)) {
+        if (index > -1) {
+          updatedCategories.splice(index, 1);
+        }
+      } else {
+        updatedCategories.push(category);
+      }
+
+      setSelectedCategories(updatedCategories);
+      
+      console.log("updatedCategories: ", updatedCategories)
+      if (updatedCategories.includes("Cercanos")) {
+        temp = updatedCategories.filter(item => item !== "Cercanos");
+        states.push(user?.state)
+      }else{
+        temp = updatedCategories
+        states.pop()
+      }
+
+      console.log("updatedCategories: ", temp)
+      const data = {
+        specialties: temp,
+        states: states,
+      }
+      if(temp.length == 0){
+        await resMedics()
+      }else{
+        await handleSearch(data)
+      }
+      if(temp.length == 0 && states.length == 0){
+        setMedics([])
+      }
+    };
+
+
+
     return (
       <View>
         <SubHeaderItem
@@ -398,18 +452,11 @@ const handleSearch = async (data) => {
           onPress={() => setSeeAll(!seeAll)}
         />
         <FlatList
-          data={seeAll? MedicCategories?.slice(1): MedicCategories?.slice(1,4)}
+          data={seeAll? MedicCategories: MedicCategories?.slice(0,7)}
           keyExtractor={(item, index) => index.toString()}
           horizontal={false}
           numColumns={4} // Render two items per row
-          renderItem={({ item, index }) => (
-            <Category
-              name={item.name}
-              icon={item.icon}
-              iconColor={item.iconColor}
-              backgroundColor={item.backgroundColor}
-            />
-          )}
+          renderItem={renderCategoryItem}
         />
       </View>
     )
@@ -420,7 +467,7 @@ const handleSearch = async (data) => {
    */
   const renderTopDoctors = () => {
     
-    const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
+    /* const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
    
     //const filteredDoctors = recommendedDoctors.filter(doctor => selectedCategories.includes("0") || selectedCategories.includes(doctor.categoryId));
 
@@ -478,28 +525,30 @@ const handleSearch = async (data) => {
       //console.log(data)
      await handleSearch(data)
 
-    };
+    }; */
 
     return (
       <View>
         <SubHeaderItem
-          title="Medicos"
+          title={selectedCategories.includes("Cercanos") &&  selectedCategories.length == 1?"Médicos cercanos más solicitados" : "Médicos filtrados"}
           /* navTitle="See all"
           onPress={() => navigation.navigate("TopDoctors")} */
         />
-        <FlatList
+        {/* <FlatList
           data={MedicCategories}
           keyExtractor={item => item.id}
           showsHorizontalScrollIndicator={false}
           horizontal
           renderItem={renderCategoryItem}
-        />
+        /> */}
         <View style={{
           backgroundColor: COLORS.secondaryWhite,
           marginVertical: 16,
           marginBottom:100
         }}>
-          <FlatList
+          {!medics.length == 0? 
+          (
+            <FlatList
             data={medics}
             keyExtractor={item => item.uuid}
             renderItem={({ item }) => {
@@ -519,6 +568,17 @@ const handleSearch = async (data) => {
               )
             }}
           />
+          )
+          :
+          (
+            <NotFoundCard 
+              text={"Vuelva a usar los filtros para tener resultados"} 
+              imageStyle={{with:140, height:200, marginVertical: 0}} 
+              containerStyle={{marginVertical: 0}}
+              titleStyle={{marginVertical: 0}}
+            />
+          )}
+          
         </View>
       </View>
     )

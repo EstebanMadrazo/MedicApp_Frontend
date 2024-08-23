@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "Medica",
-    "slug": "Medica",
+    "name": "Premed",
+    "slug": "Premed",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/premed/icon-premed.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/premed/splash-premed.png",
       "resizeMode": "contain",
-      "backgroundColor": "#246BFD"
+      "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,8 +19,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#246BFD"
+        "foregroundImage": "./assets/images/premed/icon-premed-android.png",
+        "backgroundColor": "#ffffff"
       },
       "package": "com.greenfieldteam.premed"
     },

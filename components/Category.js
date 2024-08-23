@@ -2,14 +2,16 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import { COLORS, SIZES } from '../constants';
 
-const Category = ({   name, icon, iconColor, backgroundColor }) => {
+const Category = ({   name, icon, iconColor, backgroundColor, onPress}) => {
 
   return (
     <View style={styles.container}>
         <TouchableOpacity 
            style={[styles.iconContainer, {
             backgroundColor: backgroundColor
-           }]}>
+           }]}
+           onPress={onPress}
+           >
             <Image
                 source={icon}
                 resizeMode='contain'

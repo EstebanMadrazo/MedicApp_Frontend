@@ -157,7 +157,7 @@ const CreateNewPassword = ({ route, navigation }) => {
             secureTextEntry={true}
             value={confirmNewPassword}
           />
-          <View style={styles.checkBoxContainer}>
+          {/* <View style={styles.checkBoxContainer}>
             <View style={{ flexDirection: 'row' }}>
               <Checkbox
                 style={styles.checkbox}
@@ -171,12 +171,12 @@ const CreateNewPassword = ({ route, navigation }) => {
                 }]}>Remenber me</Text>
               </View>
             </View>
-          </View>
+          </View> */}
           <View>
           </View>
         </ScrollView>
         <Button
-          title="Continue"
+          title="Continuar"
           filled
           onPress={handlePassword}
           style={styles.button}
