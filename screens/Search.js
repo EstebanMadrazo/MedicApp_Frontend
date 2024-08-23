@@ -33,18 +33,17 @@ const Search = ({ navigation }) => {
 
   const handleSearch = async () => {
     //Si todos los campos son vacios no permite continuar 
-    if (keyword == null && specialities.length == 0 && states.length == 0){
+    if (keyword == null && selectedCategories.length == 0 && states.length == 0){
       setMedics([])
       return
     }
   
-    
     const search = {
-      specialities,
+      specialities: selectedCategories,
       states,
       keyword
     }
-  
+    console.log("SEARCH ",search)
     const res = await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/filterMedics`, {
       method: "POST",
       headers: {
@@ -165,7 +164,7 @@ const Search = ({ navigation }) => {
                           rating={item?.score}
                           //numReviews={item.numReviews}
                           isAvailable={true}
-                          onPress={() => navigation.navigate("DoctorDetails")}
+                          onPress={() => navigation.navigate("DoctorDetails", {medicInfo: JSON.stringify(item)})}
                         />
                       );
                     }}

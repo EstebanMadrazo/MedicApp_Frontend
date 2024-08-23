@@ -1,13 +1,9 @@
 import { View, Text, StyleSheet, Modal, TouchableWithoutFeedback, Image } from 'react-native';
 import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../components/Header';
-import { ScrollView } from "react-native-virtualized-view";
 import { COLORS, SIZES, icons, illustrations } from '../constants';
-import { OtpInput } from "react-native-otp-entry";
-import Button from "../components/Button";
+import Button from "./Button";
 
-const PayModal = ({ modalVisible, setModalVisible }) => {
+const FailurePayModal = ({ modalVisible, setModalVisible}) => {
     
     return (
         <Modal
@@ -32,35 +28,20 @@ const PayModal = ({ modalVisible, setModalVisible }) => {
                                 style={styles.editPencilIcon}
                             />
                         </View>
-                        <Text style={styles.modalTitle}>Felicidades!</Text>
+                        <Text style={styles.modalTitle}>Pago no procesado!</Text>
                         <Text style={[styles.modalSubtitle, {
                             color: COLORS.black,
                         }]}>
-                            Cita reservada y pagada con éxito. Recibirá una notificación y el médico que haya seleccionado se pondrá en contacto con usted.
+                            No se pudo procesar su pago con éxito, inténtelo nuevamente
                         </Text>
                         <Button
-                            title="Continuar"
+                            title="Cerrar"
                             filled
                             onPress={() => {
                                 setModalVisible(false)
-                                navigation.navigate("Home")
                             }}
                             style={styles.successBtn}
-                        />
-                        <Button
-                            title="Ver Recibo"
-                            onPress={() => {
-                                setModalVisible(false)
-                                navigation.navigate("EReceipt")
-                            }}
-                            textColor={COLORS.primary}
-                            style={{
-                                width: "100%",
-                                marginTop: 12,
-                                borderRadius: 32,
-                                backgroundColor: COLORS.tansparentPrimary,
-                                borderColor: COLORS.tansparentPrimary
-                            }}
+                            color={COLORS.red}
                         />
                     </View>
                 </View>
@@ -87,17 +68,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginVertical: 64
     },
-    OTPStyle: {
-        borderColor: COLORS.black,
-        borderRadius: 8,
-        height: 58,
-        width: 58,
-        backgroundColor: COLORS.secondaryWhite,
-        borderBottomColor: "gray",
-        borderBottomWidth: .4,
-        borderWidth: .4,
-        borderColor: "gray"
-    },
     codeContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -113,7 +83,7 @@ const styles = StyleSheet.create({
     time: {
         fontFamily: "medium",
         fontSize: 18,
-        color: COLORS.primary
+        color: COLORS.redRose
     },
     button: {
         borderRadius: 32,
@@ -127,7 +97,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 24,
         fontFamily: "bold",
-        color: COLORS.primary,
+        color: COLORS.red,
         textAlign: "center",
         marginVertical: 12
     },
@@ -156,12 +126,14 @@ const styles = StyleSheet.create({
     modalIllustration: {
         height: 180,
         width: 180,
-        marginVertical: 22
+        marginVertical: 22,
+        tintColor:COLORS.red
     },
     successBtn: {
         width: "100%",
         marginTop: 12,
-        borderRadius: 32
+        borderRadius: 32,
+        borderColor: COLORS.redRose
     },
     receiptBtn: {
         width: "100%",
@@ -189,4 +161,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default PayModal
+export default FailurePayModal

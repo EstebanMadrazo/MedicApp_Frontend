@@ -8,6 +8,7 @@ import { Link, useNavigation } from '@react-navigation/native';
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import NotFoundCard from '../components/NotFoundCard';
 
 const UpcomingBooking = () => {
   const [bookings, setBookings] = useState(upcomingAppointments);
@@ -29,7 +30,7 @@ const UpcomingBooking = () => {
     console.log(data)
     try{
       
-      const appointments = await axios({
+      const response = await axios({
         url:`${process.env.EXPO_PUBLIC_API_URL}/appointments/appointmentInfo`,
         method:"GET",
         params:{
@@ -41,13 +42,15 @@ const UpcomingBooking = () => {
       const today = new Date()
       //Convierte utc en horario local
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset())
-      for(let i = 0; i< appointments.data.appointmentsInfo.length; i++){
+      for(let i = 0; i< response.data.appointmentsInfo.length; i++){
         //Convierte 2024-04-07 11:00:00 en 2024-04-07T17:00:00.000Z, es decir, de local a utc 
-        const appointmentDate = new Date(appointments.data.appointmentsInfo[i].appointment.date)
+        const appointmentDate = new Date(response.data.appointmentsInfo[i].appointment.date)
 
         //Convierte de utc a local y despues compara si la fecha actual es menor a la fecha de la cita
-        if((today.getTime() <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && appointments.data.appointmentsInfo[i].appointment.is_cancelled == 0){
-          upcomingAppoint.push(appointments.data.appointmentsInfo[i])
+        if((today.getTime() <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && response.data.appointmentsInfo[i].appointment.is_cancelled == 0){
+          if(response.data.appointmentsInfo[i].appointment.is_verified == 1){
+            upcomingAppoint.push(response.data.appointmentsInfo[i])
+          }
         }
       }
       setAppointments(upcomingAppoint)
@@ -150,14 +153,7 @@ const UpcomingBooking = () => {
         )}
       />*/}
       {appointments.length === 0 ? (
-        <View style={[styles.container, {
-          justifyContent:"center",
-          alignItems:"center"
-        }]}>
-          <Text style={{
-            fontSize:25
-          }}>No hay proximas disponibles</Text>
-        </View>
+        <NotFoundCard text={" "} title={"No tiene citas pendientes"}/>
       ) : (
         <FlatList
           data={appointments.reverse()}
@@ -181,7 +177,7 @@ const UpcomingBooking = () => {
                   <View>
                     <Image
                       source={{
-                          uri:`${item.info.profile_picture}`,
+                          uri:`${item?.info?.profile_picture}`,
                           Cache:'none'
                         }}
                       resizeMode='cover'
@@ -189,22 +185,22 @@ const UpcomingBooking = () => {
                     />
                     <View style={styles.reviewContainer}>
                       <FontAwesome name="star" size={12} color="orange" />
-                      <Text style={styles.rating}>{item.info.score}</Text>
+                      <Text style={styles.rating}>{item?.info?.score}</Text>
                     </View>
                   </View>
                   <View style={styles.detailsRightContainer}>
                     <Text style={[styles.name, {
                       color: COLORS.greyscale900
-                    }]}>{item.appointment.external_patient ? item.appointment.external_patient : item.info.given_name}</Text>
+                    }]}>{item.appointment.external_patient ? item.appointment.external_patient : item?.info?.given_name}</Text>
                     <Text style={[styles.name, {
                       color: COLORS.greyscale900
-                    }]}>{item.appointment.external_patient ? "PACIENTE EXTERNO" : item.info.family_name}</Text>
+                    }]}>{item.appointment.external_patient ? "PACIENTE EXTERNO" : item?.info?.family_name}</Text>
                     <View style={styles.priceContainer}>
                       <Text style={[styles.address, {
                         color: COLORS.grayscale700,
                       }]}>{item.appointment.is_video_call === 1 ? "Virtual":"Presencial"} - </Text>
                       <View style={styles.statusContainer}>
-                        <Text style={styles.statusText}>{item.appointment.is_cancelled == 0 ? "Agendado":""}</Text>
+                        <Text style={styles.statusText}>{item.appointment.is_verified == 1 ? "Pagada":"No pagada"}</Text>
                       </View>
                     </View>
                     <Text style={[styles.address, {
@@ -217,9 +213,12 @@ const UpcomingBooking = () => {
                     navigation.navigate({
                       name:
                         item.appointment.is_video_call == true ? 
-                        "MyAppointmentMessaging" :
-                        "MyAppointmentVideoCall",
-                      
+                        "MyAppointmentVideoCall" 
+                        :"MyAppointmentMessaging",
+                        params: {
+                          appointmentInfo: item, // or any other parameter you want to pass
+                          externalPatient: item.appointment.external_patient
+                        }
                     })
                   }
                   style={styles.iconContainer}>
@@ -348,7 +347,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 24,
     borderRadius: 6,
-    backgroundColor: "transparent",
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
     borderColor: COLORS.primary,
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 10,
-    color: COLORS.primary,
+    color: COLORS.white,
     fontFamily: "medium",
   },
   separateLine: {

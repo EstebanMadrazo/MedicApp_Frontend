@@ -1,4 +1,4 @@
-import { useStripe } from "@stripe/stripe-react-native";
+import { PaymentIntent, useStripe } from "@stripe/stripe-react-native";
 import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 //import { router } from "expo-router";
@@ -7,12 +7,12 @@ import Button from "./Button";
 import { SIZES } from "../constants";
 
 
-export default function CheckoutScreen({amount,hp,appointment_uuid }: {amount:string,hp:string,appointment_uuid:string}) {
+export default function CheckoutScreen({amount,hp,appointment_uuid, setSuccessPay, setFailurePay }: {amount:string,hp:string,appointment_uuid:string, setSuccessPay: Function, setFailurePay: Function}) {
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [loading, setLoading] = useState(false);
     
     const fetchPaymentSheetParams = async () => {
-      const response = await fetch(`${process.env.API_STRIPE_URL}/stripe-payment-intent`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/payments/stripe-payment-intent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,6 +38,7 @@ export default function CheckoutScreen({amount,hp,appointment_uuid }: {amount:st
       const {
         paymentIntent
       } = await fetchPaymentSheetParams();
+
       console.log('INIT PAYSHEET: ',paymentIntent)
       const { error } = await initPaymentSheet({
         merchantDisplayName: "Example, Inc.",
@@ -55,14 +56,17 @@ export default function CheckoutScreen({amount,hp,appointment_uuid }: {amount:st
     };
   
     const openPaymentSheet = async () => {
+        const init = await initializePaymentSheet();
+        console.log("INIT: ", init)
         const { error } = await presentPaymentSheet();
         console.log("ERROR: ", error)
         if (error) {
-          Alert.alert('Error', 'No realizó el pago de su cita')
+          setFailurePay(true)
+          setLoading(false)
           //await deleteAppointment(appointment_uuid)
-          console.log("ERROR: ", error)
+          //console.log("ERROR: ", error)
         } else {
-          Alert.alert('Success', 'Su pago se realizó correctamente');
+          setSuccessPay(true)
           //router.replace('/(app)/(tabs)/Schedule')
         }
   
@@ -83,20 +87,20 @@ export default function CheckoutScreen({amount,hp,appointment_uuid }: {amount:st
         console.log('error',e.response.data)
       }
     }
-  
+
     useEffect(() => {
-      initializePaymentSheet();
+      //initializePaymentSheet();
     }, []);
   
     return (
         <>
           <Button
             title="Pagar Cita"
-            onPress={openPaymentSheet}
+            onPress={()=> openPaymentSheet()}
             filled
             style={styles.continueBtn}
-            disabled={!loading}
-            isLoading={!loading}
+            disabled={loading}
+            isLoading={loading}
           />
         </>
     );

@@ -8,9 +8,10 @@ import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useSession } from '../ctx';
-import PayModal from '../components/PayModal';
+import SuccessPayModal from '../components/SuccessPayModal';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import CheckoutScreen from '../components/StripeCheckout';
+import FailurePayModal from '../components/FailurePayModal';
 
 const ReviewSummary = ({ route, navigation }) => {
   const {appointmentInfo, paymentMethod} = route.params
@@ -30,8 +31,9 @@ const ReviewSummary = ({ route, navigation }) => {
   const year = appointmentInfo.date.split(' ')[0].split('-')[0]
   const time = appointmentInfo.date.split(" ")[1]
   const amount = medic.price
-  const [modalVisible, setModalVisible] = useState(false);
   const  medicName = `${medic.given_name} ${medic.family_name}`
+  const [successPay, setSuccessPay] = useState(false)
+  const [failurePay, setFailurePay] = useState(false);
 
   const getData = async () => {
     try {
@@ -68,6 +70,15 @@ const ReviewSummary = ({ route, navigation }) => {
     }
   }
 
+  const returnToAppointments = () => {
+    navigation.navigate("Home")
+  }
+
+  const seeEReceipt = () => {
+    navigation.navigate("EReceipt")
+  }
+  console.log(process.env.EXPO_STRIPE_KEY)
+
   const payToPayPal = async() => {
       try{
           const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/payments/create-order`,{
@@ -99,7 +110,8 @@ const ReviewSummary = ({ route, navigation }) => {
     <SafeAreaView style={[styles.area, {
       backgroundColor: COLORS.tertiaryWhite
     }]}>
-      <PayModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+      <SuccessPayModal modalVisible={successPay} setModalVisible={setSuccessPay} back={returnToAppointments} action={seeEReceipt}/>
+      <FailurePayModal modalVisible={failurePay} setModalVisible={setFailurePay}/>
       <View style={[styles.container, {
         backgroundColor: COLORS.tertiaryWhite
       }]}>
@@ -233,8 +245,8 @@ const ReviewSummary = ({ route, navigation }) => {
 
         </ScrollView>
         {paymentMethod !== 'Paypal'? (
-            <StripeProvider publishableKey={process.env.STRIPE_KEY}>
-                <CheckoutScreen amount={amount} hp={medicName} appointment_uuid={appointmentInfo.uuid} />
+            <StripeProvider publishableKey={process.env.EXPO_STRIPE_KEY}>
+                <CheckoutScreen amount={amount} hp={medicName} appointment_uuid={appointmentInfo.uuid} setSuccessPay={setSuccessPay} setFailurePay={setFailurePay}/>
             </StripeProvider>
           )
           :
