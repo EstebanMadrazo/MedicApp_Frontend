@@ -1,9 +1,10 @@
-import { validate } from 'validate.js';
+import { format, validate } from 'validate.js';
 
 export const validateString = (id,value)=>{
     const constraints = {
         presence: {
-            allowEmpty: false
+            allowEmpty: false,
+            message: "El valor no puede estar en blanco."
         }
     };
 
@@ -23,7 +24,7 @@ export const validateEmail = (id,value)=>{
     const constraints ={
         presence : {
             allowEmpty: false,
-            message: "^Este campo es obligatorio"
+            message: "Este campo es obligatorio"
         }
     };
 
@@ -89,11 +90,31 @@ export const validateExpiryDate = (id, value) => {
         allowEmpty: false,
       },
       format: {
-        pattern: /^(0[1-9]|1[0-2])\/?([0-9]{2})$/,
+        pattern: (/[^0-9]/g, ''),
         message: "Invalid expiry date. Please use MM/YY format.",
       },
     };
   
+    const validationResult = validate({ [id]: value }, { [id]: constraints });
+    return validationResult && validationResult[id];
+  };
+
+  export const validatePhoneNumberLength = (id, value) => {
+    const constraints = {
+      presence: {
+        allowEmpty: false,
+        message:"No puede ser vacio "
+      },
+      length:{
+        is:10,
+        message:"Maximo de 10 digitos "
+      },
+      format:{
+        pattern: /[0-9]{1,10}$/,
+        message: "Unicamente numeros "
+      }
+    };
+    console.log(id, value)
     const validationResult = validate({ [id]: value }, { [id]: constraints });
     return validationResult && validationResult[id];
   };

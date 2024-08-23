@@ -139,13 +139,13 @@ const Profile = ({ navigation }) => {
     return (
       <View style={styles.settingsContainer}>
         {data?.role === 'Medic' ?
-        (<SettingsItem
-          icon={icons.location2Outline}
-          name="Direccion"
-          onPress={() => navigation.navigate("Address")}
-        />)
-        :
-        (<></>)
+          (<SettingsItem
+            icon={icons.location2Outline}
+            name="Direccion"
+            onPress={() => navigation.navigate("Address")}
+          />)
+          :
+          (<></>)
         }
         <SettingsItem
           icon={icons.userOutline}
@@ -170,8 +170,23 @@ const Profile = ({ navigation }) => {
               onPress={() => navigation.navigate("SettingsPayment")}
             />
           )
-          :
-          (<></>)
+          : data?.role === 'Patient' ?
+
+            (
+              <SettingsItem
+                icon={icons.content}
+                name="Historial Medico"
+                onPress={() => navigation.navigate("SettingsPayment")}
+              />
+            )
+            :
+            (
+              <SettingsItem
+                icon={icons.box}
+                name="Productos"
+                onPress={() => navigation.navigate("SettingsPayment")}
+              />
+            )
         }
         <SettingsItem
           icon={icons.shieldOutline}
@@ -319,14 +334,14 @@ const Profile = ({ navigation }) => {
             filled
             style={styles.logoutButton}
             onPress={async () => (
-              await signOut(), 
-              refRBSheet.current.close(), 
+              await signOut(),
+              refRBSheet.current.close(),
               navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
                   routes: [{ name: 'Login' }],
                 })
-            ))}
+              ))}
           />
         </View>
       </RBSheet>

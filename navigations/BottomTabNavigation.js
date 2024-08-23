@@ -1,4 +1,4 @@
-import { View, Platform, Image, Text } from 'react-native';
+import { View, Platform, Image, Text, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { COLORS, FONTS, icons } from '../constants';
@@ -25,13 +25,15 @@ const BottomTabNavigation = () => {
         }
         fetchData()
     }, [loading])
-
-    console.log('LOADING: ',loading)
     return (
+        <>
+            {loading && loading == true ? (
+                <ActivityIndicator size={35} color={COLORS.primary} /> 
+            ) : (
                 <Tab.Navigator screenOptions={{
                     tabBarShowLabel: false,
                     headerShown: false,
-                    unmountOnBlur:true,
+                    unmountOnBlur: true,
                     tabBarStyle: {
                         position: 'absolute',
                         justifyContent: "center",
@@ -63,7 +65,7 @@ const BottomTabNavigation = () => {
                                         <Text style={{
                                             ...FONTS.body4,
                                             color: focused ? COLORS.primary : COLORS.gray3,
-                                        }}>{data?.role === 'Medic' ? "Medic":"Patient"}</Text>
+                                        }}>Inicio</Text>
                                     </View>
                                 )
                             },
@@ -88,7 +90,7 @@ const BottomTabNavigation = () => {
                                         <Text style={{
                                             ...FONTS.body4,
                                             color: focused ? COLORS.primary : COLORS.gray3,
-                                        }}>Appointm..</Text>
+                                        }}>Citas</Text>
                                     </View>
                                 )
                             },
@@ -113,7 +115,7 @@ const BottomTabNavigation = () => {
                                         <Text style={{
                                             ...FONTS.body4,
                                             color: focused ? COLORS.primary : COLORS.gray3,
-                                        }}>History</Text>
+                                        }}>Historial</Text>
                                     </View>
                                 )
                             },
@@ -138,13 +140,15 @@ const BottomTabNavigation = () => {
                                         <Text style={{
                                             ...FONTS.body4,
                                             color: focused ? COLORS.primary : COLORS.gray3,
-                                        }}>Profile</Text>
+                                        }}>Perfil</Text>
                                     </View>
                                 )
                             },
                         }}
                     />
                 </Tab.Navigator>
+            )}
+        </>
     )
 }
 

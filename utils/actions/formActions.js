@@ -4,15 +4,17 @@ import {
     validatePassword,
     validateCreditCardNumber,
     validateExpiryDate,
-    validateCVV
+    validateCVV,
+    validatePhoneNumberLength
 } from '../ValidationConstraints'
 
 export const validateInput = (inputId, inputValue) => {
+    console.log('FORM ACTION ',inputId, inputValue)
     if (
         inputId === 'fullName' ||
         inputId === 'location' ||
         inputId === 'userName' ||
-        inputId === 'phoneNumber' ||
+        
         inputId === 'creditCardHolderName' ||
         inputId === 'bio' ||
         inputId === 'address' ||
@@ -36,5 +38,9 @@ export const validateInput = (inputId, inputValue) => {
         return validateExpiryDate(inputId, inputValue)
     }else if(inputId === 'cvv'){
         return validateCVV(inputId, inputValue)
+    }
+    else if(inputId === 'phoneNumber'){
+        console.log(inputId)
+        return validatePhoneNumberLength(inputId, inputValue)
     }
 }
