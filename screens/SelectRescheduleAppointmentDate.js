@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TouchableWithoutFeedback, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
 import { ScrollView } from 'react-native-virtualized-view';
@@ -8,19 +8,27 @@ import { getFormatedDate } from "react-native-modern-datepicker";
 import DatePickerView from '../components/DatePickerView';
 import { hoursData } from '../data';
 import Button from '../components/Button';
+import axios from 'axios';
+import { useSession } from "../ctx";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NotAvailableDayCard from '../components/NotAvailableDayCard';
 
-const SelectRescheduleAppointmentDate = ({ navigation }) => {
+const SelectRescheduleAppointmentDate = ({ route, navigation }) => {
+    const {appointment} = route.params
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const [selectedHour, setSelectedHour] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-
     const today = new Date();
-    const startDate = getFormatedDate(
-        new Date(today.setDate(today.getDate() + 1)),
-        "YYYY/MM/DD"
-    );
-
-    const [startedDate, setStartedDate] = useState("12/12/2023");
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset())
+    const startDate = getFormatedDate(today,"YYYY/MM/DD");
+    const appointmentDate = getFormatedDate(appointment.appointment.date,"YYYY/MM/DD")
+    const [selectedDate, setSelectedDate] = useState(appointmentDate);
+    const {session} = useSession();
+    const [info, setInfo] = useState()
+    const [token, setToken] = useState()
+    const [medicInfo, setMedicInfo] = useState()
+    const [availableHours, setAvailableHours] = useState()
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleOnPressStartDate = () => {
         setOpenStartDatePicker(!openStartDatePicker);
@@ -31,16 +39,100 @@ const SelectRescheduleAppointmentDate = ({ navigation }) => {
         setSelectedHour(hour);
     };
 
+    const getData = async () => {
+        try {
+          let value = await AsyncStorage.getItem('userInfo')
+          setInfo(JSON.parse(value))
+          let token = await AsyncStorage.getItem('tokens')
+          token = token?.substring(1, token?.length-1)
+          setToken(token)
+        } catch (e) {
+          console.log(e)
+        }
+    }
+
+    const resMedicAvailability = async() => {
+        try{
+          const responseInfo = await axios(`${process.env.EXPO_PUBLIC_API_URL}/user/medicAvailability`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization":'bearer ' + session,
+              "Refresher":'bearer ' + token,
+            },
+            params:{
+              date:selectedDate.replace(/\//g, '-'),
+              uuid:appointment.appointment.health_professional_uuid
+            }
+          })
+          const day = getDayOfWeek(selectedDate)
+          setMedicInfo(responseInfo.data)
+          setAvailableHours(responseInfo.data.schedule_preferences?.schedule[day])
+          console.log("Responce: ", responseInfo.data.schedule_preferences?.schedule)
+        }catch(e){
+          console.log(e.response.data)
+        }
+    }
+
+    const getDayOfWeek = (dateString) => {
+        const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const date = new Date(dateString.replace(/\//g, '-'));
+        date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
+        const dayIndex = date.getDay();
+        return daysOfWeek[dayIndex];
+    };
+
+    const RescheduleAppointment = async() => {
+        setIsLoading(true)
+        const hp_uuid = appointment.appointment.health_professional_uuid
+        const appointmentUUID =  appointment.appointment.uuid
+        const appointmentData = {
+            appointmentDate: selectedDate.replace(/\//g, '-') + ' ' + selectedHour,
+            hp_uuid,
+            appointmentUUID,
+            isVideocall:appointment.appointment.is_videocall
+            };
+            try{
+            const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/appointments/rescheduleAppointment`,{
+                method:'POST',
+                headers:{
+                    'Content-Type':"application/json",
+                    'Authorization': `bearer ${session}`,
+                    'refresher' : token
+                },
+                data:appointmentData
+            })
+            console.log( 'response', resp.data)
+            setModalVisible(true)
+        }catch(e){
+            console.log(e.response.data)
+            setIsLoading(false)
+        }  
+    }
+
+    useEffect(() => {
+    getData()
+    }, [])
+
+    useEffect(() => {
+    if(selectedDate){
+        resMedicAvailability()
+    }
+    }, [selectedDate])
+
     // Render each hour as a selectable button
     const renderHourItem = ({ item }) => {
         return (
             <TouchableOpacity
                 style={[
-                    styles.hourButton,
-                    selectedHour === item.id && styles.selectedHourButton]}
-                onPress={() => handleHourSelect(item.id)}>
-                <Text style={[styles.hourText,
-                selectedHour === item.id && styles.selectedHourText]}>{item.hour}</Text>
+                    styles.hourButton,item.isAvailable===false? styles.blockedHourButton:
+                    selectedHour === item.hour && styles.selectedHourButton]}
+                onPress={() => handleHourSelect(item.hour)}
+                disabled={!item.isAvailable}
+                >
+                <Text style={[styles.hourText,item.isAvailable===false?
+                styles.blockedHourText :
+                selectedHour === item.hour && styles.selectedHourText]}>{item.hour}</Text>
             </TouchableOpacity>
         );
     };
@@ -70,22 +162,25 @@ const SelectRescheduleAppointmentDate = ({ navigation }) => {
                                     style={styles.editPencilIcon}
                                 />
                             </View>
-                            <Text style={styles.modalTitle}>Congratulations!</Text>
+                            <Text style={styles.modalTitle}>Reagendado con Éxito</Text>
                             <Text style={[styles.modalSubtitle, {
                                 color: COLORS.black,
                             }]}>
-                                Appointment successfully booked. You will receive a notification and the doctor you selected will contact you.
+                                Cita Reagendada con éxito. Recibirá una notificación y el médico seleccionado se pondrá en contacto con usted..
                             </Text>
                             <Button
-                                title="Continue"
+                                title="Continuar"
                                 filled
                                 onPress={() => {
                                     setModalVisible(false)
-                                    navigation.navigate("Home")
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'Main', params: { screen: 'Appointment' } }],
+                                      });
                                 }}
                                 style={styles.successBtn}
                             />
-                            <Button
+                            {/* <Button
                                 title="View Appointment"
                                 onPress={() => {
                                     setModalVisible(false)
@@ -99,7 +194,7 @@ const SelectRescheduleAppointmentDate = ({ navigation }) => {
                                     backgroundColor: COLORS.tansparentPrimary,
                                     borderColor: COLORS.tansparentPrimary
                                 }}
-                            />
+                            /> */}
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
@@ -110,37 +205,47 @@ const SelectRescheduleAppointmentDate = ({ navigation }) => {
     return (
         <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                <Header title="Reschedule Appointment" />
+                <Header title="Reagendar Cita" />
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Date</Text>
+                    <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Seleccione su Nueva Fecha</Text>
                     <View style={styles.datePickerContainer}>
                         <DatePickerView
                             open={openStartDatePicker}
                             startDate={startDate}
-                            selectedDate={startedDate}
+                            selectedDate={selectedDate}
                             onClose={() => setOpenStartDatePicker(false)}
-                            onChangeStartDate={(date) => setStartedDate(date)}
+                            onChangeStartDate={(date) => setSelectedDate(date)}
                         />
                     </View>
-                    <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Select Hour</Text>
-                    <FlatList
-                        data={hoursData}
-                        renderItem={renderHourItem}
-                        numColumns={3}
-                        keyExtractor={(item) => item.id.toString()}
-                        showsVerticalScrollIndicator={false}
-                        style={{ marginVertical: 12 }}
-                    />
+                    <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Selecione la Hora</Text>
+                    {availableHours !== undefined ? (
+                        <FlatList
+                            data={availableHours}
+                            renderItem={renderHourItem}
+                            numColumns={3}
+                            keyExtractor={(item) => item?.hour}
+                            showsVerticalScrollIndicator={false}
+                            style={{ marginVertical: 12 }}
+                        />
+                    ) 
+                    : 
+                    (
+                        <View>
+                            <NotAvailableDayCard/>
+                        </View>
+                    )}
                 </ScrollView>
             </View>
             <View style={[styles.bottomContainer, {
                 backgroundColor: COLORS.white
             }]}>
                 <Button
-                    title="Next"
+                    title="Reagendar Cita"
                     filled
                     style={styles.btn}
-                    onPress={() => setModalVisible(true)}
+                    isLoading={isLoading}
+                    disabled={isLoading}
+                    onPress={RescheduleAppointment}
                 />
             </View>
             {renderModal()}
@@ -168,30 +273,39 @@ const styles = StyleSheet.create({
         marginVertical: 12
     },
     hourButton: {
-        borderRadius: 32,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#ccc',
         marginHorizontal: 5,
-        borderColor: COLORS.primary,
+        borderColor: COLORS.redRose,
         borderWidth: 1.4,
         width: (SIZES.width - 32) / 3 - 9,
         height: 40,
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: 6
+        marginBottom: 6,
+        backgroundColor: COLORS.white
     },
     selectedHourButton: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: COLORS.redRose,
+    },
+    blockedHourButton: {
+        backgroundColor: COLORS.greyscale300,
+        borderColor: COLORS.greyscale300
     },
     selectedHourText: {
         fontSize: 16,
         fontFamily: 'semiBold',
         color: COLORS.white
     },
+    blockedHourText: {
+        fontSize: 16,
+        fontFamily: 'semiBold',
+        color: COLORS.grayscale700
+    },
     hourText: {
         fontSize: 16,
         fontFamily: 'semiBold',
-        color: COLORS.primary
+        color: COLORS.redRose
     },
     bottomContainer: {
         position: "absolute",
@@ -204,7 +318,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     btn: {
-        width: SIZES.width - 32
+        width: SIZES.width - 32,
     },
     modalTitle: {
         fontSize: 24,

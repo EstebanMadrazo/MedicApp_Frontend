@@ -115,7 +115,7 @@ const BookAppointment = ({ route, navigation }) => {
             <View style={[styles.container, { backgroundColor: COLORS.white }]}>
                 <Header title="Agendar cita" />
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Seleccione su fecha</Text>
+                    <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Seleccione su Fecha</Text>
                     <View style={styles.datePickerContainer}>
                         <DatePickerView
                             open={openStartDatePicker}

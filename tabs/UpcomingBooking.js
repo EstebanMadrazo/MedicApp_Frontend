@@ -16,6 +16,7 @@ const UpcomingBooking = () => {
   const [appointments, setAppointments] = useState([]);
   const refRBSheet = useRef();
   const navigation = useNavigation();
+  const [selectedAppoint, setSelectedAppoint] = useState()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +59,23 @@ const UpcomingBooking = () => {
       console.err(err.response.data)
     }
   }
+
+  const handleCancel = async(uuid) => {
+    const appointmentUUID = uuid
+    //console.log("UUID: ",appointmentUUID)
+    try{
+      const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/appointments/cancelAppointment`,{
+          method:'POST',
+          headers:{
+              'Content-Type':"application/json",
+          },
+          data:{appointmentUUID}
+      })
+      console.log('response', resp.data)
+  }catch(e){
+      console.log("error: ",e.response)
+    }  
+}
 
   return (
     <View style={[styles.container, {
@@ -240,12 +258,15 @@ const UpcomingBooking = () => {
               }]} />
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                  onPress={() => refRBSheet.current.open()}
+                  onPress={() => {
+                    refRBSheet.current.open()
+                    setSelectedAppoint(item)
+                  }}
                   style={styles.cancelBtn}>
                   <Text style={styles.cancelBtnText}>Cancelar Cita</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("RescheduleAppointment")}
+                  onPress={() => navigation.navigate("SelectRescheduleAppointmentDate", {appointment: item})}
                   style={styles.receiptBtn}>
                   <Text style={styles.receiptBtnText}>Reagendar Cita</Text>
                 </TouchableOpacity>
@@ -309,7 +330,10 @@ const UpcomingBooking = () => {
             style={styles.removeButton}
             onPress={() => {
               refRBSheet.current.close();
-              navigation.navigate("CancelAppointment");
+              console.log(selectedAppoint.appointment.uuid)
+              handleCancel(selectedAppoint.appointment.uuid)
+              getAppointments()
+              //navigation.navigate("CancelAppointment");
             }}
           />
         </View>

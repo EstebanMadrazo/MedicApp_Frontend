@@ -7,7 +7,7 @@ import Button from "./Button";
 import { SIZES } from "../constants";
 
 
-export default function CheckoutScreen({amount,hp,appointment_uuid, setSuccessPay, setFailurePay }: {amount:string,hp:string,appointment_uuid:string, setSuccessPay: Function, setFailurePay: Function}) {
+export default function CheckoutScreen({amount,hp,appointment_uuid, setSuccessPay, setFailurePay }: {amount:string,hp:string,appointment_uuid:string, setSuccessPay: any, setFailurePay: any}) {
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [loading, setLoading] = useState(false);
     
@@ -57,7 +57,7 @@ export default function CheckoutScreen({amount,hp,appointment_uuid, setSuccessPa
   
     const openPaymentSheet = async () => {
         const init = await initializePaymentSheet();
-        console.log("INIT: ", init)
+        //console.log("INIT: ", init)
         const { error } = await presentPaymentSheet();
         console.log("ERROR: ", error)
         if (error) {

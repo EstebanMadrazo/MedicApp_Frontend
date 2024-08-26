@@ -13,7 +13,8 @@
         "EXPO_PUBLIC_API_URL":"https://premed.one/api/v1",
         "EXPO_PUBLIC_RECOVERY_SECRET": "Vm0wd2VHUXhTWGhXV0doVllteEtXRmxVU2xOWFZsbDNXa1JTVjFKdGVEQmFWVll3VmpGYWMySkVUbHBXVmxwUVZqQmFZV1JIVmtsalJuQlhWakF3ZUZkV1pEUlpWMUpJVm10V1VtSkdXbGhaYTFaM1ZsWmFkR05GWkZwV01VcElWbTAxVjJGc1NuUmhSemxWVm14d1YxcFZXbXRYUjFKSVVteHdWMDFWY0ZsV1Z6QXhWREpHYzFOdVVsWmlSMmhoV1ZSR1lWbFdjRmhsUjBaWFlrZFNlVll5ZUVOV01rVjNZMFpTVjFaV2NGTmFSRVpEVld4Q1ZVMUVNRDA9",
         "EXPO_PUBLIC_GATEWAY_API_URL": "https://premed.one/api/v1",
-        "EXPO_PUBLIC_CHAT_SOCKET": "https://premed.one" 
+        "EXPO_PUBLIC_CHAT_SOCKET": "https://premed.one", 
+        "EXPO_STRIPE_KEY" : "pk_live_51Pifz8Kwc2GLTdkK8T5eBoSpnCyqSpCdy96oSZ9IGilFqTfmMH816XJS5gURoACR1O362txtFmU3TvrdcJxgnaRJ0064d2JmTA"
       }
     },
     "production": {

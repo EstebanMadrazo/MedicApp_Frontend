@@ -23,6 +23,7 @@ const Home = ({ navigation }) => {
   const [medics, setMedics] = useState([])
   const [seeAll, setSeeAll] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
+  const [isLoading, setIsLoading] = useState(false)
  
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
@@ -546,7 +547,7 @@ const handleSearch = async (data) => {
           marginVertical: 16,
           marginBottom:100
         }}>
-          {!medics.length == 0? 
+          {!medics.length == 0 && !isLoading? 
           (
             <FlatList
             data={medics}
