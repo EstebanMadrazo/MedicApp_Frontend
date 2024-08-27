@@ -13,6 +13,9 @@ import DatePickerModal from '../components/DatePickerModal';
 import Button from '../components/Button';
 import RNPickerSelect from 'react-native-picker-select';
 import { useRoute } from '@react-navigation/native';
+import axios from 'axios'
+import { useSession } from '../ctx';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const isTestMode = false;
 
@@ -21,6 +24,8 @@ const isTestMode = false;
 const EditProfile = ({ navigation }) => {
   const route = useRoute();
   const { userInfo } = route.params || {}
+  const { session, signOut } = useSession()
+  const [tokens, setTokens] = useState()
   const [image, setImage] = useState(null);
   const [error, setError] = useState();
   const [formState, dispatchFormState] = useReducer(reducer, {
@@ -49,21 +54,54 @@ const EditProfile = ({ navigation }) => {
   ];
 
   const handleGenderChange = (value) => {
+    if(value === ""){
+      return
+    }
     setSelectedGender(value);
   };
 
-  const updateProfile = () => {
+  const updateProfile = async () => {
+    const result = JSON.parse(await AsyncStorage.getItem('userInfo'))
+    console.log(result)
     console.log(formState.inputValidities)
     const errors = []
     for (element in formState.inputValidities) {
-      formState.inputValidities[element] !== undefined| false | [] ? errors.push(formState.inputValidities[element]) : null
+      formState.inputValidities[element] ? errors.push(formState.inputValidities[element]) : null
     }
     console.log(errors.length)
     if(errors.length > 0){
-      console.log('Has Errors')
+      //Aqui va el modal
+      Alert.alert('Error',"Asegurese de llenar correctamente todos los campos")
       return
     }
-    console.log('No errors')
+    const data = {
+      given_name: formState.inputValues.fullName,
+      family_name:formState.inputValues.familyName,
+      email: formState.inputValues.email,
+      sex: selectedGender,
+      birthdate: startDate,
+      phone_number:formState.inputValues.phoneNumber
+    }
+    //Alert.alert('1', result.refreshToken)
+    Alert.alert(result.refreshToken)
+    try{
+      const response = await axios({
+        url: `${process.env.EXPO_PUBLIC_API_URL}/user/updateInfo`,
+        method: "PATCH",
+        data:{
+          update:{userInfo:data}, 
+          uuid:result.uuid
+        },
+        headers: {
+            "Authorization": `bearer ${session}`,
+            "Refresher": `bearer ${result.refreshToken}`
+        }
+    })
+      console.log('Response ',response)
+    }catch(error){
+      Alert('Error al actualizar el perfil', error.response.data.message)
+    }
+    Alert.alert('2', "Responded")
   }
 
   const today = new Date(userInfo.birthdate);
@@ -128,6 +166,7 @@ const EditProfile = ({ navigation }) => {
           }
         }
       })
+      
   }, [])
 
   // render countries codes modal
@@ -344,7 +383,7 @@ const EditProfile = ({ navigation }) => {
       <DatePickerModal
         open={openStartDatePicker}
         startDate={startDate}
-        selectedDate={formState.inputValues.birthdate}
+        selectedDate={startedDate}
         onClose={() => setOpenStartDatePicker(false)}
         onChangeStartDate={(date) => setStartedDate(date)}
       />

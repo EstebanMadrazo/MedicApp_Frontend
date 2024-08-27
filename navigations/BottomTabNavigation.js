@@ -24,7 +24,9 @@ const BottomTabNavigation = () => {
             await getUserInfo()
         }
         fetchData()
-    }, [loading])
+    }, [])
+    console.log('Data ', data)
+    console.log('USER INFO ', userInfo)
     return (
         <>
             {loading && loading == true ? (
@@ -48,7 +50,7 @@ const BottomTabNavigation = () => {
                 }}>
                     <Tab.Screen
                         name="Home"
-                        component={data?.role === 'Medic' ? Appointment : Home}
+                        component={userInfo?.userRole === 'Medic' ? Appointment : Home}
                         options={{
                             tabBarIcon: ({ focused }) => {
                                 return (

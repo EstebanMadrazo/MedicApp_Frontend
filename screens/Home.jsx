@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +23,7 @@ const Home = ({ navigation }) => {
   const [medics, setMedics] = useState([])
   const [seeAll, setSeeAll] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
  
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
@@ -176,8 +176,10 @@ const resMedics = async () => {
 
     const data = await response.json();
     setMedics(data);
+    setIsLoading(false)
   } catch (error) {
     console.error("Error fetching medics:", error);
+    setIsLoading(false)
   }
 }
 
@@ -208,7 +210,7 @@ const handleSearch = async (data) => {
   }).catch(error => console.log("ERROR: ",error))
 
   const result = res.data
- setMedics(result)
+  setMedics(result)
 }
 
 
@@ -528,6 +530,16 @@ const handleSearch = async (data) => {
 
     }; */
 
+    if(isLoading){
+      return (
+        <View style={[styles.container, {
+          backgroundColor: COLORS.tertiaryWhite,
+          justifyContent:"center"
+        }]}>
+          <ActivityIndicator size={100} color={COLORS.primary}/>
+        </View>
+      )
+    }
     return (
       <View>
         <SubHeaderItem
@@ -547,6 +559,7 @@ const handleSearch = async (data) => {
           marginVertical: 16,
           marginBottom:100
         }}>
+          
           {!medics.length == 0 && !isLoading? 
           (
             <FlatList
