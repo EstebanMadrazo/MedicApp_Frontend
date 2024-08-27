@@ -4,12 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { ScrollView } from 'react-native-virtualized-view';
 import { useRoute } from '@react-navigation/native';
+import * as io from 'socket.io-client'
 
 const MyAppointmentMessaging = ({ navigation }) => {
   const [age, setAge] = useState(0)
   const route = useRoute();
   const { appointmentInfo, externalPatient } = route.params || {};
-  
+  const [isInChatTime, setIsInChatTime] = useState(true)
+  const socket = io.connect(`${process.env.EXPO_PUBLIC_CHAT_SOCKET}`)
+
   const getAge = () => {
     if(externalPatient){
       return setAge('N/A')
@@ -22,6 +25,28 @@ const MyAppointmentMessaging = ({ navigation }) => {
 
   useEffect(()=>{
     getAge()
+    const checkTimeRange = () => {
+      const date = new Date(appointmentInfo.appointment.date);
+      console.log("DATE: ", date)
+      date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+      const currentTime = new Date();
+      currentTime.setMinutes(currentTime.getMinutes() - currentTime.getTimezoneOffset())
+
+      if (
+        currentTime.getTime() >= date.getTime() - 30 * 60 * 1000  &&
+        currentTime.getTime() <= date.getTime() + 30 * 60 * 1000
+      ) {
+        setIsInChatTime(true);
+      } else {
+        setIsInChatTime(false);
+      }
+    };
+
+    // Verificar el rango de tiempo cada minuto
+    const intervalId = setInterval(checkTimeRange, 60 * 1000);
+
+    // Limpieza del intervalo al desmontar el componente
+    return () => clearInterval(intervalId);
   })
   /**
    * Render header
@@ -29,7 +54,7 @@ const MyAppointmentMessaging = ({ navigation }) => {
   const renderHeader = () => {
     return (
       <View style={styles.headerContainer}>
-        <View style={styles.headerLeft}>
+        
           <TouchableOpacity
             onPress={() => navigation.goBack()}>
             <Image
@@ -41,9 +66,9 @@ const MyAppointmentMessaging = ({ navigation }) => {
           </TouchableOpacity>
           <Text style={[styles.headerTitle, {
             color: COLORS.black
-          }]}>My Appointment</Text>
-        </View>
-        <View style={styles.viewRight}>
+          }]}>Mi Cita</Text>
+        
+        
           <TouchableOpacity>
             <Image
               source={icons.moreCircle}
@@ -53,7 +78,7 @@ const MyAppointmentMessaging = ({ navigation }) => {
               }]}
             />
           </TouchableOpacity>
-        </View>
+        
       </View>
     )
   }
@@ -195,20 +220,23 @@ const MyAppointmentMessaging = ({ navigation }) => {
           {renderContent()}
         </ScrollView>
       </View>
-      <View style={[styles.bottomContainer, {
-        backgroundColor: COLORS.white,
-      }]}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Messaging")}
-          style={styles.btn}>
-          <Image
-            source={icons.chatBubble2}
-            resizeMode='contain'
-            style={styles.btnIcon}
-          />
-          <Text style={styles.btnText}>Message (Start at 16:00 PM)</Text>
-        </TouchableOpacity>
-      </View>
+      {isInChatTime && 
+      (
+        <View style={[styles.bottomContainer, {
+          backgroundColor: COLORS.white,
+        }]}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Messaging")}
+            style={styles.btn}>
+            <Image
+              source={icons.chatBubble2}
+              resizeMode='contain'
+              style={styles.btnIcon}
+            />
+            <Text style={styles.btnText}>Entrar al Chat</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   )
 };
@@ -234,7 +262,8 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "space-between"
   },
   backIcon: {
     height: 24,
