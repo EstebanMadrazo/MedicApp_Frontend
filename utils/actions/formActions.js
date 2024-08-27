@@ -40,7 +40,7 @@ export const validateInput = (inputId, inputValue) => {
         return validateCVV(inputId, inputValue)
     }
     else if(inputId === 'phoneNumber'){
-        console.log(inputId)
+        console.log('FORM ACTION ENTER: ', inputId)
         return validatePhoneNumberLength(inputId, inputValue)
     }
 }

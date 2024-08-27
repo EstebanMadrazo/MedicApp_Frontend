@@ -110,7 +110,7 @@ export const validateExpiryDate = (id, value) => {
         message:"Maximo de 10 digitos "
       },
       format:{
-        pattern: /[0-9]{1,10}$/,
+        pattern: /^\d{10}/,
         message: "Unicamente numeros "
       }
     };

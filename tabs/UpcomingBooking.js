@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { upcomingAppointments } from '../data';
 import { SIZES, COLORS, icons } from '../constants';
 import RBSheet from "react-native-raw-bottom-sheet";
@@ -14,6 +14,7 @@ const UpcomingBooking = () => {
   const [bookings, setBookings] = useState(upcomingAppointments);
   const [userInfo, setUserInfo] = useState();
   const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const refRBSheet = useRef();
   const navigation = useNavigation();
   const [selectedAppoint, setSelectedAppoint] = useState()
@@ -23,64 +24,76 @@ const UpcomingBooking = () => {
       await getAppointments()
     }
     fetchData()
-  },[])
+  }, [])
 
-  const getAppointments = async () => {
+  const getAppointments = useCallback(async () => {
     const data = JSON.parse(await AsyncStorage.getItem('userInfo'))
     setUserInfo(data)
     console.log(data)
-    try{
-      
+    try {
+
       const response = await axios({
-        url:`${process.env.EXPO_PUBLIC_API_URL}/appointments/appointmentInfo`,
-        method:"GET",
-        params:{
-          uuid:data.uuid,
-          role:data.userRole 
+        url: `${process.env.EXPO_PUBLIC_API_URL}/appointments/appointmentInfo`,
+        method: "GET",
+        params: {
+          uuid: data.uuid,
+          role: data.userRole
         }
-      }) 
+      })
       const upcomingAppoint = []
       const today = new Date()
       //Convierte utc en horario local
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset())
-      for(let i = 0; i< response.data.appointmentsInfo.length; i++){
+      for (let i = 0; i < response.data.appointmentsInfo.length; i++) {
         //Convierte 2024-04-07 11:00:00 en 2024-04-07T17:00:00.000Z, es decir, de local a utc 
         const appointmentDate = new Date(response.data.appointmentsInfo[i].appointment.date)
 
         //Convierte de utc a local y despues compara si la fecha actual es menor a la fecha de la cita
-        if((today.getTime() <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && response.data.appointmentsInfo[i].appointment.is_cancelled == 0){
-          if(response.data.appointmentsInfo[i].appointment.is_verified == 1){
+        if ((today.getTime() <= appointmentDate.setMinutes(appointmentDate.getMinutes() - appointmentDate.getTimezoneOffset())) && response.data.appointmentsInfo[i].appointment.is_cancelled == 0) {
+          if (response.data.appointmentsInfo[i].appointment.is_verified == 1) {
             upcomingAppoint.push(response.data.appointmentsInfo[i])
           }
         }
       }
       setAppointments(upcomingAppoint)
-    }catch(err){
+      setLoading(false);
+    } catch (err) {
       console.err(err.response.data)
+      setLoading(false);
     }
-  }
+  })
 
-  const handleCancel = async(uuid) => {
+  const handleCancel = async (uuid) => {
     const appointmentUUID = uuid
     //console.log("UUID: ",appointmentUUID)
-    try{
-      const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/appointments/cancelAppointment`,{
-          method:'POST',
-          headers:{
-              'Content-Type':"application/json",
-          },
-          data:{appointmentUUID}
+    try {
+      const resp = await axios(`${process.env.EXPO_PUBLIC_API_URL}/appointments/cancelAppointment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': "application/json",
+        },
+        data: { appointmentUUID }
       })
       console.log('response', resp.data)
-  }catch(e){
-      console.log("error: ",e.response)
-    }  
-}
+    } catch (e) {
+      console.log("error: ", e.response)
+    }
+  }
+  if (loading) {
+    return (
+      <View style={[styles.container, {
+        backgroundColor: COLORS.tertiaryWhite,
+        justifyContent: "center"
+      }]}>
+        <ActivityIndicator size={100} color={COLORS.primary} />
+      </View>
+    )
+  }
 
   return (
     <View style={[styles.container, {
       backgroundColor: COLORS.tertiaryWhite,
-      justifyContent:"center"
+      justifyContent: "center"
     }]}>
       {/*<FlatList
         data={bookings}
@@ -171,7 +184,7 @@ const UpcomingBooking = () => {
         )}
       />*/}
       {appointments.length === 0 ? (
-        <NotFoundCard text={" "} title={"No tiene citas pendientes"}/>
+        <NotFoundCard text={" "} title={"No tiene citas pendientes"} />
       ) : (
         <FlatList
           data={appointments.reverse()}
@@ -182,22 +195,22 @@ const UpcomingBooking = () => {
               <TouchableOpacity
                 onPress={() => navigation.navigate({
                   name:
-                    item.appointment.is_video_call == true ? 
-                    "MyAppointmentVideocall" :
-                    "MyAppointmentMessaging",
-                    params: {
-                      appointmentInfo: item, // or any other parameter you want to pass
-                      externalPatient: item.appointment.external_patient
-                    }
+                    item.appointment.is_video_call == true ?
+                      "MyAppointmentVideocall" :
+                      "MyAppointmentMessaging",
+                  params: {
+                    appointmentInfo: item, // or any other parameter you want to pass
+                    externalPatient: item.appointment.external_patient
+                  }
                 })}
                 style={styles.detailsViewContainer}>
                 <View style={styles.detailsContainer}>
                   <View>
                     <Image
                       source={{
-                          uri:`${item?.info?.profile_picture}`,
-                          Cache:'none'
-                        }}
+                        uri: `${item?.info?.profile_picture}`,
+                        Cache: 'none'
+                      }}
                       resizeMode='cover'
                       style={styles.serviceImage}
                     />
@@ -216,9 +229,9 @@ const UpcomingBooking = () => {
                     <View style={styles.priceContainer}>
                       <Text style={[styles.address, {
                         color: COLORS.grayscale700,
-                      }]}>{item.appointment.is_video_call === 1 ? "Virtual":"Presencial"} - </Text>
+                      }]}>{item.appointment.is_video_call === 1 ? "Virtual" : "Presencial"} - </Text>
                       <View style={styles.statusContainer}>
-                        <Text style={styles.statusText}>{item.appointment.is_verified == 1 ? "Pagada":"No pagada"}</Text>
+                        <Text style={styles.statusText}>{item.appointment.is_verified == 1 ? "Pagada" : "No pagada"}</Text>
                       </View>
                     </View>
                     <Text style={[styles.address, {
@@ -227,16 +240,16 @@ const UpcomingBooking = () => {
                   </View>
                 </View>
                 <TouchableOpacity
-                  onPress={() => 
+                  onPress={() =>
                     navigation.navigate({
                       name:
-                        item.appointment.is_video_call == true ? 
-                        "MyAppointmentVideoCall" 
-                        :"MyAppointmentMessaging",
-                        params: {
-                          appointmentInfo: item, // or any other parameter you want to pass
-                          externalPatient: item.appointment.external_patient
-                        }
+                        item.appointment.is_video_call == true ?
+                          "MyAppointmentVideoCall"
+                          : "MyAppointmentMessaging",
+                      params: {
+                        appointmentInfo: item, // or any other parameter you want to pass
+                        externalPatient: item.appointment.external_patient
+                      }
                     })
                   }
                   style={styles.iconContainer}>
@@ -244,8 +257,8 @@ const UpcomingBooking = () => {
                     source={
                       item.appointment.is_video_call == true
                         ? icons.videoCamera
-                        : icons.appointment 
-                        // Add a fallback in case none of the conditions match
+                        : icons.appointment
+                      // Add a fallback in case none of the conditions match
                     }
                     resizeMode='contain'
                     style={styles.chatIcon}
@@ -266,13 +279,13 @@ const UpcomingBooking = () => {
                   <Text style={styles.cancelBtnText}>Cancelar Cita</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("SelectRescheduleAppointmentDate", {appointment: item})}
+                  onPress={() => navigation.navigate("SelectRescheduleAppointmentDate", { appointment: item })}
                   style={styles.receiptBtn}>
                   <Text style={styles.receiptBtnText}>Reagendar Cita</Text>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
-        )}
+          )}
         />
       )}
       <RBSheet
@@ -309,7 +322,7 @@ const UpcomingBooking = () => {
           }]}>¿Estás seguro de que deseas cancelar la cita?</Text>
           <Text style={[styles.cancelSubtitle, {
             color: COLORS.grayscale700
-          }]}>El reembolso procederá de acuerdo con nuestras políticas de reembolsos, especificadas en los <Link onPress={() => refRBSheet.current.close()} to={{screen: 'TaC'}} style={{color:COLORS.primary}}>términos y condiciones.</Link></Text>
+          }]}>El reembolso procederá de acuerdo con nuestras políticas de reembolsos, especificadas en los <Link onPress={() => refRBSheet.current.close()} to={{ screen: 'TaC' }} style={{ color: COLORS.primary }}>términos y condiciones.</Link></Text>
         </View>
 
         <View style={styles.bottomContainer}>
@@ -338,14 +351,15 @@ const UpcomingBooking = () => {
           />
         </View>
       </RBSheet>
-      
+
     </View>
+
   )
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     backgroundColor: COLORS.tertiaryWhite,
     marginVertical: 22
   },
