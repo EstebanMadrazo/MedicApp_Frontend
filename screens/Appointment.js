@@ -23,13 +23,13 @@ const Appointment = ({ navigation }) => {
   const [index, setIndex] = React.useState(0);
   const [routesPatient] = React.useState([
     { key: 'first', title: 'Próximas' },
-    { key: 'second', title: 'Completadas' },
+    { key: 'second', title: 'Pasadas' },
     { key: 'third', title: 'No Pagadas' }
   ]);
 
   const [routesMedic] = React.useState([
     { key: 'first', title: 'Próximas' },
-    { key: 'second', title: 'Completadas' },
+    { key: 'second', title: 'Pasadas' },
   ]);
 
   const getData = async () => {
