@@ -1,17 +1,18 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES, icons, images } from '../constants';
 import { ScrollView } from 'react-native-virtualized-view';
 import { useRoute } from '@react-navigation/native';
-import * as io from 'socket.io-client'
+import useUserData from '../components/UserData';
+
 
 const MyAppointmentMessaging = ({ navigation }) => {
   const [age, setAge] = useState(0)
   const route = useRoute();
   const { appointmentInfo, externalPatient } = route.params || {};
   const [isInChatTime, setIsInChatTime] = useState(true)
-  const socket = io.connect(`${process.env.EXPO_PUBLIC_CHAT_SOCKET}`)
+  const {data,loading} = useUserData()
 
   const getAge = () => {
     if(externalPatient){
@@ -27,14 +28,14 @@ const MyAppointmentMessaging = ({ navigation }) => {
     getAge()
     const checkTimeRange = () => {
       const date = new Date(appointmentInfo.appointment.date);
-      console.log("DATE: ", date)
+      //console.log("DATE: ", date)
       date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
       const currentTime = new Date();
       currentTime.setMinutes(currentTime.getMinutes() - currentTime.getTimezoneOffset())
 
       if (
-        currentTime.getTime() >= date.getTime() - 30 * 60 * 1000  &&
-        currentTime.getTime() <= date.getTime() + 30 * 60 * 1000
+        currentTime.getTime() >= date.getTime() - 60 * 60 * 1000  &&
+        currentTime.getTime() <= date.getTime() + 60 * 60 * 1000
       ) {
         setIsInChatTime(true);
       } else {
@@ -88,6 +89,15 @@ const MyAppointmentMessaging = ({ navigation }) => {
 
   const renderContent = () => {
     return (
+    <>
+      {loading? 
+      (
+        <View style={{ backgroundColor: COLORS.tertiaryWhite, marginTop:250, justifyContent:'center', flexDirection:'column'}}>
+          <ActivityIndicator size={150} color={COLORS.primary}/>
+        </View>
+      ) 
+      : 
+      (
       <View>
         <View style={{ backgroundColor: COLORS.tertiaryWhite }}>
           <View style={[styles.doctorCard, {
@@ -130,7 +140,7 @@ const MyAppointmentMessaging = ({ navigation }) => {
         }]}>{appointmentInfo.appointment.date.split(" ")[1]}</Text>
         <Text style={[styles.subtitle, {
           color: COLORS.greyscale900
-        }]}>Información del Paciente</Text>
+        }]}>{data.role == "Medic"? "Información del Paciente" : "Información del Médico"}</Text>
         <View style={styles.viewContainer}>
           <View style={styles.viewLeft}>
             <Text style={[styles.description, {
@@ -209,6 +219,8 @@ const MyAppointmentMessaging = ({ navigation }) => {
           </View>
         </View>
       </View>
+      )}
+    </>
     )
   }
 
@@ -220,13 +232,13 @@ const MyAppointmentMessaging = ({ navigation }) => {
           {renderContent()}
         </ScrollView>
       </View>
-      {isInChatTime && 
+      {isInChatTime && externalPatient == "" &&
       (
         <View style={[styles.bottomContainer, {
           backgroundColor: COLORS.white,
         }]}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Messaging")}
+            onPress={() => navigation.navigate("Messaging", {appointmentInfo: appointmentInfo, userInfo:data})}
             style={styles.btn}>
             <Image
               source={icons.chatBubble2}

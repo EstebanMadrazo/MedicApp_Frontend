@@ -24,6 +24,8 @@ const Home = ({ navigation }) => {
   const [seeAll, setSeeAll] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState(["Cercanos"]);
   const [isLoading, setIsLoading] = useState(true)
+
+  console.log(specialties)
  
   const mapSpecialtyToCategory = (specialty, index) => {
     switch (specialty) {
@@ -213,7 +215,7 @@ const handleSearch = async (data) => {
   setMedics(result)
 }
 
-
+//Usar el Hook de useUserData para disminuir los ciclos de renderizado
 
   useEffect(() => {
     resSpecialties()
@@ -455,10 +457,10 @@ const handleSearch = async (data) => {
           onPress={() => setSeeAll(!seeAll)}
         />
         <FlatList
-          data={seeAll? MedicCategories: MedicCategories?.slice(0,7)}
+          data={seeAll? MedicCategories: MedicCategories?.slice(0,6)}
           keyExtractor={(item, index) => index.toString()}
           horizontal={false}
-          numColumns={4} // Render two items per row
+          numColumns={3} // Render two items per row
           renderItem={renderCategoryItem}
         />
       </View>
