@@ -24,7 +24,7 @@ const NotificationCard = ({ icon, title, description, date, onPress }) => {
                     <Text style={styles.description}>{description}</Text>
                 </View>
             </View>
-            <Text style={styles.date}>{getTimeAgo(date)}</Text>
+            {/* <Text style={styles.date}>{getTimeAgo(date)}</Text> */}
         </TouchableOpacity>
     )
 }

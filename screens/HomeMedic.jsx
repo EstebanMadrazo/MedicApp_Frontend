@@ -17,6 +17,7 @@ import NotAvailableDayCard from '../components/NotAvailableDayCard';
 import Button from '../components/Button';
 import { getFormatedDate } from "react-native-modern-datepicker";
 import useUserData from '../components/UserData';
+import * as Notifications from 'expo-notifications';
 
 const HomeMedic = ({ navigation }) => {
     const today = new Date();
@@ -39,6 +40,18 @@ const HomeMedic = ({ navigation }) => {
     const [selectedDate, setSelectedDate] = useState(startDate);
     const [appointments, setAppointments] = useState([])
     const [doctorInfo, setDoctorInfo] = useState()
+
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+        }),
+        handleSuccess: () => {
+          // dismiss notification immediately after it is presented
+          Notifications.getPresentedNotificationsAsync();
+        },
+      });
 
     useEffect(() => {
         fetchData = async () => {

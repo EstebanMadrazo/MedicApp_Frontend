@@ -4,9 +4,55 @@ import { COLORS, icons, images, SIZES } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import NotificationCard from '../components/NotificationCard';
-import { notifications } from '../data';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+//import { notifications } from '../data';
 
 const Notifications = ({ navigation }) => {
+  const[userInfo, setUserInfo] = useState()
+  const[notifications, setNotifications] = useState([]) 
+  console.log(notifications)
+  
+  const getData = async () =>{
+    try{
+      let value = await AsyncStorage.getItem('userInfo')        
+      setUserInfo(JSON.parse(value))
+    }catch(e){
+      console.log(e)
+    }
+  }
+
+  const getAllNotifications = async() =>{
+    try {
+        const response = await axios(`${process.env.EXPO_PUBLIC_API_URL}/notifications/getAllNotifications`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            params:{
+              uuid: userInfo?.uuid
+            }
+        })
+        console.log("RESPONSE: ", response.data[0].data.appointment)
+        setNotifications(response.data)
+    } catch (error) {
+        console.log("Error: ",error.response.data)
+    }
+  }
+
+  useEffect(()=>{
+    getData()
+  },[])
+
+  useEffect(()=>{
+    if(userInfo){
+      getAllNotifications()
+    }
+  },[userInfo])
+
+
+
   /**
    * Render header
    */
@@ -89,18 +135,23 @@ const Notifications = ({ navigation }) => {
               <Text style={styles.clearAll}>Clear All</Text>
             </TouchableOpacity>
           </View> */}
+          <View style={{marginBottom:50}}>
           <FlatList
             data={notifications}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.data.id}
             renderItem={({ item }) => (
               <NotificationCard
                 title={item.title}
-                description={item.description}
-                icon={icons.calendar3}
-                date={item.date}
+                description={item.body}
+                icon={
+                  item.data.type_notification =="create_appointment"? 
+                  icons.calendar3 : item.data.type_notification == "reschedule_appointment"?
+                  icons.appointment : item.data.type_notification == "chat_message"? icons.chat : icons.cancelSquare}
+                date={item.body}
               />
             )}
           />
+          </View>
         </ScrollView>
       </View>
     </SafeAreaView>

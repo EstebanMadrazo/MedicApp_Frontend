@@ -10,7 +10,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 //import 'react-native-get-random-values';
 //import { v4 as uuidv4 } from 'uuid';
-//import * as Notifications from 'expo-notifications';
+import * as Notifications from 'expo-notifications';
 
 const Messaging = ({ route, navigation }) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -24,8 +24,8 @@ const Messaging = ({ route, navigation }) => {
   const [text, setText] = useState<string>()
   var currentMessage = ""
 
-  //const notificationListener = useRef<Notifications.Subscription | null>(null);
-  //const responseListener = useRef<Notifications.Subscription | null>(null);
+  const notificationListener = useRef<Notifications.Subscription | null>(null);
+  const responseListener = useRef<Notifications.Subscription | null>(null);
 
   const joinRoom = async () => {
     await socket?.emit("join_room", room)
@@ -57,7 +57,7 @@ const Messaging = ({ route, navigation }) => {
         const info = {
             sender: username,
             session_id:room,
-            sent_at: new Date(),
+            sent_at: new Date().setMinutes(new Date(). getMinutes() - new Date().getTimezoneOffset()),
             content: currentMessage,
             sender_uuid: user_uuid
         }

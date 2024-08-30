@@ -32,8 +32,8 @@ const ReviewSummary = ({ route, navigation }) => {
   const time = appointmentInfo.date.split(" ")[1]
   const amount = medic.price
   const  medicName = `${medic.given_name} ${medic.family_name}`
-  const [successPay, setSuccessPay] = useState(false)
-  const [failurePay, setFailurePay] = useState(false);
+  /* const [successPay, setSuccessPay] = useState(false)
+  const [failurePay, setFailurePay] = useState(false); */
 
   const getData = async () => {
     try {
@@ -70,14 +70,14 @@ const ReviewSummary = ({ route, navigation }) => {
     }
   }
 
-  const returnToAppointments = () => {
+  /* const returnToAppointments = () => {
     navigation.navigate("Home")
   }
 
   const seeEReceipt = () => {
     navigation.navigate("EReceipt")
-  }
-  console.log(process.env.EXPO_STRIPE_KEY)
+  } */
+  console.log("STRIPE KEY: ",process.env.EXPO_PUBLIC_STRIPE_KEY)
 
   const payToPayPal = async() => {
       try{
@@ -110,8 +110,6 @@ const ReviewSummary = ({ route, navigation }) => {
     <SafeAreaView style={[styles.area, {
       backgroundColor: COLORS.tertiaryWhite
     }]}>
-      <SuccessPayModal modalVisible={successPay} setModalVisible={setSuccessPay} back={returnToAppointments} action={seeEReceipt}/>
-      <FailurePayModal modalVisible={failurePay} setModalVisible={setFailurePay}/>
       <View style={[styles.container, {
         backgroundColor: COLORS.tertiaryWhite
       }]}>
@@ -245,8 +243,8 @@ const ReviewSummary = ({ route, navigation }) => {
 
         </ScrollView>
         {paymentMethod !== 'Paypal'? (
-            <StripeProvider publishableKey={process.env.EXPO_STRIPE_KEY}>
-                <CheckoutScreen amount={amount} hp={medicName} appointment_uuid={appointmentInfo.uuid} setSuccessPay={setSuccessPay} setFailurePay={setFailurePay}/>
+            <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_KEY}>
+                <CheckoutScreen amount={amount} hp={medicName} appointment_uuid={appointmentInfo.uuid}/>
             </StripeProvider>
           )
           :

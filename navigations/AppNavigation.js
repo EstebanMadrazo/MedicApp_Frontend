@@ -36,6 +36,7 @@ const AppNavigation = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [userInfo, setUserInfo] = useState(null)
 
+
   useEffect(() => {
     const checkIfFirstLaunch = async () => {
       try {

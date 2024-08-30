@@ -1,15 +1,20 @@
 import { PaymentIntent, useStripe } from "@stripe/stripe-react-native";
 import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
+import { StyleSheet, TouchableOpacity, Text } from "react-native";
 //import { router } from "expo-router";
 import axios from "axios";
 import Button from "./Button";
 import { SIZES } from "../constants";
+import SuccessPayModal from "./SuccessPayModal";
+import FailurePayModal from "./FailurePayModal";
+import { useNavigation } from "@react-navigation/native";
 
-
-export default function CheckoutScreen({amount,hp,appointment_uuid, setSuccessPay, setFailurePay }: {amount:string,hp:string,appointment_uuid:string, setSuccessPay: any, setFailurePay: any}) {
+export default function CheckoutScreen({amount,hp,appointment_uuid, }: {amount:string,hp:string,appointment_uuid:string,}) {
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [loading, setLoading] = useState(false);
+    const [successPay, setSuccessPay] = useState(false)
+    const [failurePay, setFailurePay] = useState(false);
+    const navigation = useNavigation()
     
     const fetchPaymentSheetParams = async () => {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/payments/stripe-payment-intent`, {
@@ -88,12 +93,24 @@ export default function CheckoutScreen({amount,hp,appointment_uuid, setSuccessPa
       }
     }
 
+    const returnToAppointments = () => {
+      //@ts-ignore
+      navigation.navigate("Main")
+    }
+  
+    const seeEReceipt = () => {
+      //@ts-ignore
+      navigation.navigate("EReceipt")
+    }
+
     useEffect(() => {
       //initializePaymentSheet();
     }, []);
   
     return (
         <>
+          <SuccessPayModal modalVisible={successPay} setModalVisible={setSuccessPay} back={returnToAppointments} action={seeEReceipt}/>
+          <FailurePayModal modalVisible={failurePay} setModalVisible={setFailurePay}/>
           <Button
             title="Pagar Cita"
             onPress={()=> openPaymentSheet()}
