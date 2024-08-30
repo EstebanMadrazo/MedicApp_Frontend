@@ -1,11 +1,12 @@
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
-import { useCallback } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { FONTS } from './constants/fonts';
 import AppNavigation from './navigations/AppNavigation';
-import { LogBox } from 'react-native';
+import { Alert, LogBox,  } from 'react-native';
 import { SessionProvider } from "./ctx"
+
 //Ignore all log notifications
 LogBox.ignoreAllLogs();
 

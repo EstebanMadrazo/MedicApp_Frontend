@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, Alert, TouchableOpacity, Platform } from 'react-native';
+import React, { useCallback, useEffect, useReducer, useState, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES, icons, images } from '../constants';
 //import Header from '../components/Header';
@@ -14,6 +14,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Buffer } from 'buffer'
 import { useSession } from "../ctx";
 import { Controller, useForm, SubmitHandler, FieldValues } from "react-hook-form";
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants'
+import axios from 'axios';
 
 const isTestMode = true;
 const initialState = {
@@ -28,6 +32,65 @@ const initialState = {
   formIsValid: false,
 }
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+  handleSuccess: () => {
+    // dismiss notification immediately after it is presented
+    Notifications.getPresentedNotificationsAsync();
+  },
+});
+
+function handleRegistrationError(errorMessage) {
+  alert(errorMessage);
+  //throw new Error(errorMessage);
+}
+
+async function registerForPushNotificationsAsync() {
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      handleRegistrationError('Permission not granted to get push token for push notification!');
+      return;
+    }
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    if (!projectId) {
+      handleRegistrationError('Project ID not found');
+    }
+    try {
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(pushTokenString);
+      return pushTokenString;
+    } catch (e) {
+      handleRegistrationError(`${e}`);
+    }
+  } else {
+    handleRegistrationError('Must use physical device for push notifications');
+  }
+}
+
 const Login = ({ navigation }) => {
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const [error, setError] = useState(null);
@@ -36,12 +99,74 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState()
   const [isDisabled, setIsDisabled] = useState(false)
   const { signIn } = useSession();
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(
+    undefined
+  );
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   const {
     handleSubmit,
     control,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+      .then(token => setExpoPushToken(token ?? ''))
+      //.catch((error: any) => setExpoPushToken(`${error}`));
+    
+      function redirect(notification) {
+        const url = notification.request.content.data?.url;
+        /* if (url) {
+          router.replace(url);
+        } */
+      }  
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+      // DISMISS ALL NOTIFICATION UPON RECEIVING NOTIFICATION WHILE IN FOREGROUND
+      Notifications.dismissAllNotificationsAsync();
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+      // DISMISS ALL NOTIFICATION AFTER INTERACTION
+      Notifications.dismissAllNotificationsAsync();
+      redirect(response.notification);
+    });    
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
+
+  }, []);
+
+
+  const handleExpoPushToken = async (uuid) => {
+      console.log(expoPushToken)
+      try{
+        const response = await axios(`${process.env.EXPO_PUBLIC_API_URL}/notifications/handleExpoToken`, {
+         method: "POST",
+         headers:{
+          'Content-Type':"application/json",
+          'Authorization': Buffer.from('test:pwd', 'utf8').toString('base64'),
+        },
+         data:{
+          user_uuid: uuid,
+          user_token: expoPushToken
+         }
+       })
+      }catch(e){
+        console.log("Entro en Error")
+        console.log(e.response)
+      }
+  }
+  
   
 
   const inputChangedHandler = useCallback(
@@ -106,9 +231,9 @@ const Login = ({ navigation }) => {
           } else { 
             //router.push({ pathname: "/(app)/(tabs)/Home", params: { uuid: responseData.uuid } }); 
             navigation.navigate("Main")
-          }/* if(expoPushToken){
-            //await handleExpoPushToken(responseData.uuid)
-          } */
+          }if(expoPushToken){
+            await handleExpoPushToken(responseData.uuid)
+          }
         }
       })
       .catch((error) => { console.log(error) }
@@ -121,9 +246,9 @@ const Login = ({ navigation }) => {
     }
   }, [error]);
 
-  useEffect(() =>{
+  /* useEffect(() =>{
     //checkAndRedirectToHome()
-  },[])
+  },[]) */
 
   // Implementing apple authentication
   const appleAuthHandler = () => {

@@ -71,7 +71,7 @@ const DoctorDetails = ({route, navigation }) => {
 
         return (
             <View>
-                <View style={{ backgroundColor: COLORS.greyscale500 }}>
+                <View style={{ backgroundColor: COLORS.greyscale500, marginBottom:10}}>
                     <View style={[styles.doctorCard, {
                         backgroundColor: COLORS.white,
                     }]}>
@@ -101,7 +101,7 @@ const DoctorDetails = ({route, navigation }) => {
                             <Text style={styles.contentTitle}>Ubicación</Text>
                             <Text style={[styles.doctorHospital, {
                                 color: COLORS.greyScale800
-                            }]}> Calle {medic.main_st} | {medic.street_intersections} | {medic.neighborhood} | {medic.office_state}</Text>
+                            }]}>Calle {medic.main_st}{"\n"+medic.street_intersections}{"\n"+medic.neighborhood}{"\n"+medic.office_state}</Text>
                         </View>
                     </View>
                 </View>
@@ -127,7 +127,7 @@ const DoctorDetails = ({route, navigation }) => {
                                 style={styles.featureIcon}
                             />
                         </View>
-                        <Text style={styles.featureItemNum}>Precio de consulta</Text>
+                        <Text style={styles.featureItemNum}>{"Precio\nde\nconsulta"}</Text>
                         <Text style={[styles.featureItemName, {
                             color: COLORS.greyScale800
                         }]}>${medic.price}</Text>
@@ -153,7 +153,7 @@ const DoctorDetails = ({route, navigation }) => {
                                 style={styles.featureIcon}
                             />
                         </View>
-                        <Text style={styles.featureItemNum}>Citas virtuales</Text>
+                        <Text style={styles.featureItemNum}>{"Citas\nvirtuales"}</Text>
                         <Text style={[styles.featureItemName, {
                             color: COLORS.greyScale800
                         }]}>{medic.is_videocall_allowed? "Si acepta": "No acepta"}</Text>
@@ -286,8 +286,8 @@ const styles = StyleSheet.create({
     },
     doctorImage: {
         marginTop:20,
-        height: 150,
-        width: 150,
+        height: 100,
+        width: 100,
         borderRadius: 16,
         marginHorizontal: 16
     },
@@ -318,7 +318,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
-        marginVertical: 16
+        marginVertical: 16,
+        marginBottom:100
     },
     featureItemContainer: {
         alignItems: "center",
@@ -340,7 +341,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: "bold",
         color: COLORS.primary,
-        marginVertical: 6
+        marginVertical: 6,
+        textAlign:"center"
     },
     featureItemName: {
         fontSize: 14,

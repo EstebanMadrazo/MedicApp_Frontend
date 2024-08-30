@@ -6,6 +6,7 @@ import { Appointment, History, Home, Notifications, Profile } from '../screens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useUserData from '../components/UserData';
 import HomeMedic from '../screens/HomeMedic';
+import * as NotificationsExpo from 'expo-notifications';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,6 +15,18 @@ const Tab = createBottomTabNavigator();
 const BottomTabNavigation = () => {
     const [userInfo, setUserInfo] = useState();
     const { data, loading, error } = useUserData();
+
+    NotificationsExpo.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+        }),
+        handleSuccess: () => {
+          // dismiss notification immediately after it is presented
+          NotificationsExpo.getPresentedNotificationsAsync();
+        },
+      });
 
     const getUserInfo = async () => {
         const data = JSON.parse(await AsyncStorage.getItem('userInfo'))
