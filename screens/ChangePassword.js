@@ -9,7 +9,7 @@ import Input from '../components/Input';
 import Checkbox from 'expo-checkbox';
 import Button from '../components/Button';
 
-const isTestMode = true;
+const isTestMode = false;
 
 const initialState = {
   inputValues: {
@@ -31,14 +31,25 @@ const ChangePassword = ({ navigation }) => {
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [form, setForm] = useState({
+    password:'',
+    newPassword:'',
+    confirmNewPassword:''
+  })
 
   const inputChangedHandler = useCallback(
     (inputId, inputValue) => {
       const result = validateInput(inputId, inputValue)
       dispatchFormState({ inputId, validationResult: result, inputValue })
+      console.log(formState.inputValues)
     },
     [dispatchFormState]
   );
+
+  const updateFields = (field,value) => {
+    console.log(field,value)
+    setForm(prev => ({...prev, [field]:value}))
+  }
 
   useEffect(() => {
     if (error) {
@@ -99,7 +110,7 @@ const ChangePassword = ({ navigation }) => {
           </View>
           <Text style={[styles.title, { color: COLORS.black }]}>Restablecer Contraseña</Text>
           <Input
-            onInputChanged={inputChangedHandler}
+            onInputChanged={updateFields}
             errorText={formState.inputValidities['password']}
             autoCapitalize="none"
             id="password"
@@ -107,6 +118,7 @@ const ChangePassword = ({ navigation }) => {
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
+            value={form.password}
           />
           <Input
             onInputChanged={inputChangedHandler}
@@ -117,6 +129,7 @@ const ChangePassword = ({ navigation }) => {
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
+            value={formState.inputValues.newPassword}
           />
           <Input
             onInputChanged={inputChangedHandler}
@@ -127,6 +140,7 @@ const ChangePassword = ({ navigation }) => {
             placeholderTextColor={COLORS.black}
             icon={icons.padlock}
             secureTextEntry={true}
+            value={formState.inputValues.confirmNewPassword}
           />
           <View style={styles.checkBoxContainer}>
             <View style={{ flexDirection: 'row' }}>

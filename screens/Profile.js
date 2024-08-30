@@ -154,11 +154,15 @@ const Profile = ({ navigation }) => {
     return (
       <View style={styles.settingsContainer}>
         {data?.role === 'Medic' ?
-          (<SettingsItem
-            icon={icons.location2Outline}
-            name="Direccion"
-            onPress={() => navigation.navigate("Address")}
-          />)
+          (
+            <>
+              {/* <SettingsItem
+                icon={icons.location2Outline}
+                name="Direccion"
+                onPress={() => navigation.navigate("Address")}
+              /> */}
+            </>
+          )
           :
           (<></>)
         }
@@ -188,11 +192,22 @@ const Profile = ({ navigation }) => {
           : data?.role === 'Patient' ?
 
             (
-              <SettingsItem
-                icon={icons.content}
-                name="Historial Medico"
-                onPress={() => navigation.navigate("PatientQ")}
-              />
+              <>
+                {/* <SettingsItem
+                  icon={icons.content}
+                  name="Historial Medico"
+                  onPress={() => navigation.navigate({
+                    name: "PatientQ",
+                    params: {
+                      handleSubmit,
+                      control,
+                      watch,
+                      formState: { errors },
+                      setValue,
+                    }
+                  })}
+                /> */}
+              </>
             )
             :
             (
