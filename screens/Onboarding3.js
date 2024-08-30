@@ -10,7 +10,7 @@ import { COLORS, images } from '../constants';
 const Onboarding3 = ({ navigation }) => {
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const intervalId = setInterval(() => {
       setProgress(prevProgress => {
         if (prevProgress >= 1) {
@@ -29,7 +29,7 @@ const Onboarding3 = ({ navigation }) => {
       // Navigate to the onboarding4 screen
       navigation.navigate('Onboarding4')
     }
-  }, [progress, navigation]);
+  }, [progress, navigation]); */
 
   return (
     <SafeAreaView style={Onboarding1Styles.container}>
@@ -47,25 +47,25 @@ const Onboarding3 = ({ navigation }) => {
           />
           <View style={Onboarding1Styles.buttonContainer}>
             <View style={Onboarding1Styles.titleContainer}>
-              <Text style={Onboarding1Styles.title}>Find and Book Your Ideal</Text>
-              <Text style={Onboarding1Styles.subTitle}>MEDICAL EXPERT</Text>
+              <Text style={Onboarding1Styles.title}>Puedes agendar tu cita y pagarla desde la app</Text>
+              <Text style={Onboarding1Styles.subTitle}>AGENDA</Text>
             </View>
 
             <Text style={Onboarding1Styles.description}>
-              Find the best doctor near you with just one of best app.
+              Encuentra el horario ideal para ti
             </Text>
 
             <View style={Onboarding1Styles.dotsContainer}>
               {progress < 1 && <DotsView progress={progress} numDots={4} />}
             </View>
             <Button
-              title="Next"
+              title="Siguiente"
               filled
               onPress={() => navigation.navigate('Onboarding4')}
               style={Onboarding1Styles.nextButton}
             />
             <Button
-              title="Skip"
+              title="Saltar"
               onPress={() => navigation.navigate('Login')}
               textColor={COLORS.primary}
               style={Onboarding1Styles.skipButton}

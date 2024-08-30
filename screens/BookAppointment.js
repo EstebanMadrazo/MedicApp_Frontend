@@ -125,6 +125,7 @@ const BookAppointment = ({ route, navigation }) => {
                             onChangeStartDate={(date) => {setSelectedDate(date), setSelectedHour(null)}}
                         />
                     </View>
+                    <View style={{marginBottom:100}}>
                     <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Seleccione la hora</Text>
                     {availableHours !== undefined ? (
                         <FlatList
@@ -138,11 +139,11 @@ const BookAppointment = ({ route, navigation }) => {
                     ) 
                     : 
                     (
-                        <View>
+                        <View style={{marginBottom:100}}>
                             <NotAvailableDayCard/>
                         </View>
                     )}
-                    
+                    </View>
                 </ScrollView>
             </View>
             <View style={[styles.bottomContainer, {

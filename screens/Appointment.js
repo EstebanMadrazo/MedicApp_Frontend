@@ -23,13 +23,13 @@ const Appointment = ({ navigation }) => {
   const [index, setIndex] = React.useState(0);
   const [routesPatient] = React.useState([
     { key: 'first', title: 'Próximas' },
-    { key: 'second', title: 'Pasadas' },
+    { key: 'second', title: 'Completadas' },
     { key: 'third', title: 'No Pagadas' }
   ]);
 
   const [routesMedic] = React.useState([
     { key: 'first', title: 'Próximas' },
-    { key: 'second', title: 'Pasadas' },
+    { key: 'second', title: 'Completadas' },
   ]);
 
   const getData = async () => {
@@ -88,7 +88,7 @@ const Appointment = ({ navigation }) => {
             Mis Citas
           </Text>
         </View>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image
             source={icons.moreCircle}
             resizeMode='contain'
@@ -96,7 +96,7 @@ const Appointment = ({ navigation }) => {
               tintColor: COLORS.greyscale900
             }]}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     )
   }

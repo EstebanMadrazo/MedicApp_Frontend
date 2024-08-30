@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
 import React from 'react';
-import { COLORS, icons } from '../constants';
+import { COLORS, icons, images, SIZES } from '../constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-virtualized-view';
 import NotificationCard from '../components/NotificationCard';
@@ -10,7 +10,7 @@ const Notifications = ({ navigation }) => {
   /**
    * Render header
    */
-  const renderHeader = () => {
+  /* const renderHeader = () => {
     return (
       <View style={styles.headerContainer}>
         <TouchableOpacity
@@ -32,6 +32,43 @@ const Notifications = ({ navigation }) => {
         <Text>{" "}</Text>
       </View>
     )
+  } */
+
+  const renderHeader = () => {
+    return (
+      <View style={styles.headerContainer}>
+        <View style={styles.headerLeft}>
+          <Image
+            source={images.premedLogo}
+            resizeMode='contain'
+            style={styles.headerLogo}
+          />
+          <Text style={[styles.headerTitle, {
+            color: COLORS.greyscale900
+          }]}>Notificaciones</Text>
+        </View>
+        {/* <View style={styles.headerRight}>
+          <TouchableOpacity>
+            <Image
+              source={icons.search}
+              resizeMode='contain'
+              style={[styles.searchIcon, {
+                tintColor: COLORS.greyscale900
+              }]}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Image
+              source={icons.moreCircle}
+              resizeMode='contain'
+              style={[styles.moreCircleIcon, {
+                tintColor: COLORS.greyscale900
+              }]}
+            />
+          </TouchableOpacity>
+        </View> */}
+      </View>
+    )
   }
 
   return (
@@ -39,7 +76,7 @@ const Notifications = ({ navigation }) => {
       <View style={[styles.container, { backgroundColor: COLORS.white }]}>
         {renderHeader()}
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.headerNoti}>
+          {/* <View style={styles.headerNoti}>
             <View style={styles.headerNotiLeft}>
               <Text style={[styles.notiTitle, {
                 color: COLORS.greyscale900
@@ -51,7 +88,7 @@ const Notifications = ({ navigation }) => {
             <TouchableOpacity>
               <Text style={styles.clearAll}>Clear All</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           <FlatList
             data={notifications}
             keyExtractor={item => item.id}
@@ -59,7 +96,7 @@ const Notifications = ({ navigation }) => {
               <NotificationCard
                 title={item.title}
                 description={item.description}
-                icon={item.icon}
+                icon={icons.calendar3}
                 date={item.date}
               />
             )}
@@ -80,10 +117,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     padding: 16
   },
-  headerContainer: {
+  /* headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: 'center'
+  }, */
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: SIZES.width - 32,
+    justifyContent: "space-between"
   },
   headerIconContainer: {
     height: 46,
@@ -99,10 +142,25 @@ const styles = StyleSheet.create({
     height: 24,
     tintColor: COLORS.black
   },
-  headerTitle: {
+  /* headerTitle: {
     fontSize: 16,
     fontFamily: "bold",
     color: COLORS.black
+  }, */
+  headerLogo: {
+    height: 24,
+    width: 24,
+    //tintColor: COLORS.primary
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: "bold",
+    color: COLORS.black,
+    marginLeft: 12
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center"
   },
   headerNoti: {
     flexDirection: "row",

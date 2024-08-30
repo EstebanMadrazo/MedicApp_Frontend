@@ -316,7 +316,7 @@ const handleSearch = async (data) => {
           />
         </TouchableOpacity>
         <TextInput
-          placeholder='Search'
+          placeholder='Buscar Médicos'
           placeholderTextColor={COLORS.gray}
           style={styles.searchInput}
           onFocus={handleInputFocus}

@@ -11,7 +11,7 @@ const Onboarding1 = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       navigation.navigate('Onboarding2');
-    }, 2000);
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, []); // run only once after component mounts
@@ -25,9 +25,9 @@ const Onboarding1 = () => {
         // Background linear gradient
         colors={['transparent', 'rgba(0,0,0,0.8)']}
         style={styles.background}>
-        <Text style={styles.greetingText}>Welcome to 👋</Text>
-        <Text style={styles.logoName}>Medica</Text>
-        <Text style={styles.subtitle}>The best online doctor consultation app of the century for your daily needs!</Text>
+        <Text style={styles.greetingText}>Bienvenido 👋</Text>
+        <Text style={styles.logoName}>Premed</Text>
+        <Text style={styles.subtitle}>Tu aplicación de consultas médicas</Text>
       </LinearGradient>
     </ImageBackground>
   )

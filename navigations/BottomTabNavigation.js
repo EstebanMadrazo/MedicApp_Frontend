@@ -2,7 +2,7 @@ import { View, Platform, Image, Text, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { COLORS, FONTS, icons } from '../constants';
-import { Appointment, History, Home, Profile } from '../screens';
+import { Appointment, History, Home, Notifications, Profile } from '../screens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useUserData from '../components/UserData';
 
@@ -56,7 +56,7 @@ const BottomTabNavigation = () => {
                                 return (
                                     <View style={{ alignItems: "center" }}>
                                         <Image
-                                            source={focused ? icons.home : icons.home2Outline}
+                                            source={focused ? icons.home2 : icons.home2Outline}
                                             resizeMode='contain'
                                             style={{
                                                 height: 24,
@@ -99,14 +99,14 @@ const BottomTabNavigation = () => {
                         }}
                     />
                     <Tab.Screen
-                        name="History"
-                        component={History}
+                        name="Notifications"
+                        component={Notifications}
                         options={{
                             tabBarIcon: ({ focused }) => {
                                 return (
                                     <View style={{ alignItems: "center" }}>
                                         <Image
-                                            source={focused ? icons.document2 : icons.document2Outline}
+                                            source={focused ? icons.notificationFull : icons.notification}
                                             resizeMode='contain'
                                             style={{
                                                 height: 24,
@@ -117,7 +117,7 @@ const BottomTabNavigation = () => {
                                         <Text style={{
                                             ...FONTS.body4,
                                             color: focused ? COLORS.primary : COLORS.gray3,
-                                        }}>Historial</Text>
+                                        }}>Notificaciones</Text>
                                     </View>
                                 )
                             },

@@ -9,7 +9,7 @@ import { MyActivityChats, MyActivityVideoCall, MyActivityVoiceCall } from '../ta
 const renderScene = SceneMap({
   first: MyActivityChats,
   second: MyActivityVoiceCall,
-  third: MyActivityVideoCall,
+  //third: MyActivityVideoCall,
 });
 
 // Inbox tabs
@@ -18,9 +18,9 @@ const History = () => {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'first', title: 'Messages' },
-    { key: 'second', title: 'Voice Call' },
-    { key: 'third', title: 'Video Call' },
+    { key: 'first', title: 'Mensajes' },
+    { key: 'second', title: 'Citas' },
+    //{ key: 'third', title: 'Video Call' },
   ]);
 
   const renderTabBar = (props) => (
@@ -52,15 +52,15 @@ const History = () => {
       <View style={styles.headerContainer}>
         <View style={styles.headerLeft}>
           <Image
-            source={images.logo}
+            source={images.premedLogo}
             resizeMode='contain'
             style={styles.headerLogo}
           />
           <Text style={[styles.headerTitle, {
             color: COLORS.greyscale900
-          }]}>History</Text>
+          }]}>Notificaciones</Text>
         </View>
-        <View style={styles.headerRight}>
+        {/* <View style={styles.headerRight}>
           <TouchableOpacity>
             <Image
               source={icons.search}
@@ -79,7 +79,7 @@ const History = () => {
               }]}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     )
   }
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   headerLogo: {
     height: 24,
     width: 24,
-    tintColor: COLORS.primary
+    //tintColor: COLORS.primary
   },
   headerTitle: {
     fontSize: 20,

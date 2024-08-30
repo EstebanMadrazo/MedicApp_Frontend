@@ -265,6 +265,7 @@ const urgencias = require("../assets/icons/urgencias.png")
 const dermatologo = require("../assets/icons/dermatologo.png")
 const geriatra = require("../assets/icons/geriatra.png")
 const obstetra = require("../assets/icons/obstetra.png")
+const notificationFull = require("../assets/icons/notification-full.png")
 
 export default {
     addFileOutline,
@@ -535,4 +536,5 @@ export default {
     dermatologo,
     geriatra,
     obstetra,
+    notificationFull,
 }
