@@ -59,13 +59,13 @@ const HorizontalDoctorCard = ({
                     <View style={styles.priceContainer}>
                         <Text style={styles.price}>${consultationFee}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => setIsFavourite(!isFavourite)}>
+                    {/* <TouchableOpacity onPress={() => setIsFavourite(!isFavourite)}>
                         <Image
                             source={isFavourite ? icons.heart2 : icons.heart2Outline}
                             resizeMode='contain'
                             style={styles.heartIcon}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
         </TouchableOpacity>

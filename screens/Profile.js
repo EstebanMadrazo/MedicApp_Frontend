@@ -249,7 +249,7 @@ const Profile = ({ navigation }) => {
         <SettingsItem
           icon={icons.lockedComputerOutline}
           name="Politicas de Privacidad"
-          onPress={() => navigation.navigate("SettingsPrivacyPolicy")}
+          onPress={() => navigation.navigate("TaC")}
         />
         {/*<SettingsItem
           icon={icons.infoCircle}

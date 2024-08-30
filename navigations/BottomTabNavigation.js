@@ -5,6 +5,7 @@ import { COLORS, FONTS, icons } from '../constants';
 import { Appointment, History, Home, Profile } from '../screens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useUserData from '../components/UserData';
+import HomeMedic from '../screens/HomeMedic';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,7 +51,7 @@ const BottomTabNavigation = () => {
                 }}>
                     <Tab.Screen
                         name="Home"
-                        component={userInfo?.userRole === 'Medic' ? Appointment : Home}
+                        component={userInfo?.userRole === 'Medic' ? HomeMedic : Home}
                         options={{
                             tabBarIcon: ({ focused }) => {
                                 return (

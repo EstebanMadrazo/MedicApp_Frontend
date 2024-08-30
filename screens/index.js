@@ -70,6 +70,7 @@ import AddNewAddress from "./AddNewAddress";
 import Messaging from "./Messaging";
 import TermsAndConditions from "./TermsAndConditions";
 import ScheduleRegister from "./ScheduleRegister";
+import EditCard from "./EditCard";
 
 export {
     Onboarding1,
@@ -144,4 +145,5 @@ export {
     Messaging,
     TermsAndConditions,
     ScheduleRegister,
+    EditCard
 }

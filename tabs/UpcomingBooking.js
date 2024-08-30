@@ -269,7 +269,8 @@ const UpcomingBooking = () => {
                 marginVertical: 10,
                 backgroundColor: COLORS.grayscale200,
               }]} />
-              <View style={styles.buttonContainer}>
+              {(userInfo.userRole !== 'Medic') ? (
+                <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   onPress={() => {
                     refRBSheet.current.open()
@@ -284,6 +285,8 @@ const UpcomingBooking = () => {
                   <Text style={styles.receiptBtnText}>Reagendar Cita</Text>
                 </TouchableOpacity>
               </View>
+            ) : null
+            }
             </TouchableOpacity>
           )}
         />

@@ -75,15 +75,13 @@ const EditProfile = ({ navigation }) => {
       return
     }
     const data = {
-      given_name: formState.inputValues.fullName,
-      family_name:formState.inputValues.familyName,
+      firstName: formState.inputValues.fullName,
+      lastName:formState.inputValues.familyName,
       email: formState.inputValues.email,
       sex: selectedGender,
-      birthdate: startDate,
-      phone_number:formState.inputValues.phoneNumber
+      birthDate: startDate,
+      phoneNumber:formState.inputValues.phoneNumber
     }
-    //Alert.alert('1', result.refreshToken)
-    Alert.alert(result.refreshToken)
     try{
       const response = await axios({
         url: `${process.env.EXPO_PUBLIC_API_URL}/user/updateInfo`,
@@ -101,7 +99,10 @@ const EditProfile = ({ navigation }) => {
     }catch(error){
       Alert('Error al actualizar el perfil', error.response.data.message)
     }
-    Alert.alert('2', "Responded")
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main', params: { screen: 'Profile' } }],
+    });
   }
 
   const today = new Date(userInfo.birthdate);

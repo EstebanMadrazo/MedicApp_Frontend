@@ -67,7 +67,13 @@ const SettingsPayment = ({ navigation }) => {
                     <PaymentMethodItemConnected
                         title={data?.bank}
                         icon={icons.mastercard}
-                        onPress={() => navigation.navigate('AddNewCard')}
+                        onPress={() => navigation.navigate({
+                            name:
+                            "EditCard",
+                            params:{
+                                card: data
+                            }
+                        })}
                     />
                 </ScrollView>
                 <Button
