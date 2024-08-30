@@ -79,7 +79,7 @@ const EditProfile = ({ navigation }) => {
       lastName:formState.inputValues.familyName,
       email: formState.inputValues.email,
       sex: selectedGender,
-      birthDate: startDate,
+      birthDate: startedDate.replaceAll('/','-'),
       phoneNumber:formState.inputValues.phoneNumber
     }
     try{

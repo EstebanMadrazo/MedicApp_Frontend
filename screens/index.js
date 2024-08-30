@@ -71,6 +71,7 @@ import Messaging from "./Messaging";
 import TermsAndConditions from "./TermsAndConditions";
 import ScheduleRegister from "./ScheduleRegister";
 import EditCard from "./EditCard";
+import PatientQ from "../components/questionnaires/PatientQ";
 
 export {
     Onboarding1,
@@ -145,5 +146,6 @@ export {
     Messaging,
     TermsAndConditions,
     ScheduleRegister,
-    EditCard
+    EditCard,
+    PatientQ
 }

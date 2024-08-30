@@ -53,7 +53,7 @@ const VideoCallHistoryDetails = ({ navigation }) => {
                         color: COLORS.black
                     }]}></Text>
                 </View>
-                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
                     <Image
                         source={icons.moreCircle}
                         resizeMode='contain'
@@ -61,7 +61,7 @@ const VideoCallHistoryDetails = ({ navigation }) => {
                             tintColor: COLORS.black
                         }]}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         )
     }

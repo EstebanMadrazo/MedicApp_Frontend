@@ -66,11 +66,12 @@ const MyAppointmentMessaging = ({ navigation }) => {
               }]} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, {
-            color: COLORS.black
+            color: COLORS.black,
+            justifyContent:"flex-start"
           }]}>Mi Cita</Text>
         
         
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Image
               source={icons.moreCircle}
               resizeMode='contain'
@@ -78,7 +79,7 @@ const MyAppointmentMessaging = ({ navigation }) => {
                 tintColor: COLORS.black
               }]}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         
       </View>
     )
@@ -266,7 +267,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     paddingBottom: 16
   },
   scrollView: {

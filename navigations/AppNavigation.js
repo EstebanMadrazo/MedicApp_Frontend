@@ -25,7 +25,7 @@ import { AddNewAddress,
   SettingsLanguage, SettingsNotifications, SettingsPayment, SettingsPrivacyPolicy, SettingsSecurity, 
   Signup, TopDoctors, TrendingArticles, VideoCall, VideoCallHistoryDetails, VideoCallHistoryDetailsPlayRecordings, 
   VoiceCall, VoiceCallHistoryDetails, VoiceCallHistoryDetailsPlayRecordings, Welcome, TermsAndConditions,
-  ScheduleRegister,EditCard } from '../screens';
+  ScheduleRegister,EditCard, PatientQ } from '../screens';
 
 import BottomTabNavigation from './BottomTabNavigation';
 
@@ -151,6 +151,7 @@ const AppNavigation = () => {
         <Stack.Screen name="AddNewAddress" component={AddNewAddress} />
         <Stack.Screen name="Messaging" component={Messaging} />
         <Stack.Screen name="EditCard" component={EditCard} />
+        <Stack.Screen name="PatientQ" component={PatientQ} />
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -187,7 +187,7 @@ const Messaging = ({ route, navigation }) => {
                 }]}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{ marginLeft: 16 }}>
+            {/* <TouchableOpacity style={{ marginLeft: 16 }}>
               <Image
                 source={icons.moreCircle}
                 resizeMode="contain"
@@ -195,7 +195,7 @@ const Messaging = ({ route, navigation }) => {
                   tintColor: COLORS.greyscale900
                 }]}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
         <View style={[styles.chatContainer]}>
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingHorizontal: 16,
     paddingVertical: 16,
     backgroundColor: COLORS.white,

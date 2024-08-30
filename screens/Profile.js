@@ -13,6 +13,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import useUserData from '../components/UserData';
 import { CommonActions } from '@react-navigation/native';
+import {
+  Controller,
+  useForm,
+  SubmitErrorHandler,
+  SubmitHandler,
+  FieldValues,
+  useFieldArray,
+} from "react-hook-form";
 
 const Profile = ({ navigation }) => {
   const refRBSheet = useRef();
@@ -77,7 +85,7 @@ const Profile = ({ navigation }) => {
             color: COLORS.greyscale900
           }]}>Perfil</Text>
         </View>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image
             source={icons.moreCircle}
             resizeMode='contain'
@@ -85,7 +93,7 @@ const Profile = ({ navigation }) => {
               tintColor: COLORS.greyscale900
             }]}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </TouchableOpacity>
     )
   }
@@ -131,6 +139,13 @@ const Profile = ({ navigation }) => {
    */
   const renderSettings = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const {
+      handleSubmit,
+      control,
+      watch,
+      formState: { errors },
+      setValue,
+    } = useForm();
 
     const toggleDarkMode = () => {
       setIsDarkMode((prev) => !prev);
@@ -176,7 +191,7 @@ const Profile = ({ navigation }) => {
               <SettingsItem
                 icon={icons.content}
                 name="Historial Medico"
-                onPress={() => navigation.navigate("SettingsPayment")}
+                onPress={() => navigation.navigate("PatientQ")}
               />
             )
             :

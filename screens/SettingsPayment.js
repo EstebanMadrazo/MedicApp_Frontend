@@ -29,14 +29,14 @@ const SettingsPayment = ({ navigation }) => {
                         color: COLORS.greyscale900
                     }]}>Payment</Text>
                 </View>
-                <TouchableOpacity>
+                {/* <TouchableOpacity>
                     <Image
                         source={icons.moreCircle}
                         resizeMode='contain'
                         style={[styles.moreIcon, {
                             tintColor: COLORS.greyscale900
                         }]} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         )
     };

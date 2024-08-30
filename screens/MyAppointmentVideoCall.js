@@ -43,7 +43,7 @@ const MyAppointmentVideoCall = ({ navigation }) => {
           }]}>My Appointment</Text>
         </View>
         <View style={styles.viewRight}>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Image
               source={icons.moreCircle}
               resizeMode='contain'
@@ -51,7 +51,7 @@ const MyAppointmentVideoCall = ({ navigation }) => {
                 tintColor: COLORS.black
               }]}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     )
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     paddingBottom: 16
   },
   scrollView: {

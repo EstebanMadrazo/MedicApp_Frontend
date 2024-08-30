@@ -25,7 +25,7 @@ const MyAppointmentVoiceCall = ({ navigation }) => {
             color: COLORS.black
           }]}>My Appointment</Text>
         </View>
-        <View style={styles.viewRight}>
+        {/* <View style={styles.viewRight}>
           <TouchableOpacity>
             <Image
               source={icons.moreCircle}
@@ -35,7 +35,7 @@ const MyAppointmentVoiceCall = ({ navigation }) => {
               }]}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     )
   }

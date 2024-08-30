@@ -75,7 +75,7 @@ const VoiceCallHistoryDetailsPlayRecordings = ({ navigation }) => {
                         color: COLORS.black
                     }]}></Text>
                 </View>
-                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
                     <Image
                         source={icons.moreCircle}
                         resizeMode='contain'
@@ -83,7 +83,7 @@ const VoiceCallHistoryDetailsPlayRecordings = ({ navigation }) => {
                             tintColor: COLORS.black
                         }]}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         )
     }

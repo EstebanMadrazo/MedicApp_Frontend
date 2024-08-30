@@ -63,7 +63,7 @@ const EReceipt = ({ navigation }) => {
             color: COLORS.black
           }]}>E-Receipt</Text>
         </View>
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Image
             source={icons.moreCircle}
             resizeMode='contain'
@@ -71,7 +71,7 @@ const EReceipt = ({ navigation }) => {
               tintColor: COLORS.black
             }]}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     )
   }
