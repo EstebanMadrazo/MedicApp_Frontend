@@ -167,13 +167,13 @@ const ReviewSummary = ({ route, navigation }) => {
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
               }]}>Dirección</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{medic.main_st}, {medic.street_intersections}, {medic.neighborhood}, {medic.office_state}</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{medic.main_st},{"\n" + medic.street_intersections}, {"\n" + medic.neighborhood}, {"\n" + medic.office_state}</Text>
             </View>
 
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Nombre del Paciente</Text>
+              }]}>{"Nombre del\nPaciente"}</Text>
               <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{user?.given_name} {user?.family_name}</Text>
             </View>
             {/* <View style={styles.view}>
@@ -185,8 +185,8 @@ const ReviewSummary = ({ route, navigation }) => {
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
                 color: COLORS.grayscale700
-              }]}>Fecha Agendada</Text>
-              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{dayName} {day} de {monthName} del {year}</Text>
+              }]}>{"Fecha\nAgendada"}</Text>
+              <Text style={[styles.viewRight, { color: COLORS.greyscale900 }]}>{dayName} {day} de {"\n" + monthName} del {year}</Text>
             </View>
             <View style={styles.view}>
               <Text style={[styles.viewLeft, {
@@ -348,6 +348,7 @@ const styles = StyleSheet.create({
     color: COLORS.grayscale700
   },
   viewRight: {
+    marginLeft:20,
     fontSize: 14,
     fontFamily: "semiBold",
     color: COLORS.greyscale900

@@ -46,7 +46,6 @@ const initialState = {
 
 
 const Signup = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -61,7 +60,7 @@ const Signup = ({ navigation }) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profTitle, setProfTitle] = useState();
   const [profID, setProfID] = useState();
-  const [uploading, setUploading] = useState(false);
+  
   const {
     handleSubmit,
     control,
@@ -76,7 +75,7 @@ const Signup = ({ navigation }) => {
   ]
 
   //Disabled Register Button
-  const [isRegistered, setIsRegistered] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const data = [
     { label: "Médico", value: "Medic" },
@@ -105,13 +104,13 @@ const Signup = ({ navigation }) => {
   };
 
   const handleRegister = async(data) => {
-    setIsRegistered(true)
+    setIsLoading(true)
     if (!isChecked) {
       Alert.alert(
         "Error",
         "Debes aceptar los términos y condiciones de uso para registrarte."
       );
-      setIsRegistered(false)
+      setIsLoading(false)
       return
     }
 
@@ -145,7 +144,7 @@ const Signup = ({ navigation }) => {
     let uuid
     if(userType == 1 && (!profID || !profTitle || !profilePicture)){
       Alert.alert("Error","Debe de enviar todos los archivos que se solicitan")
-      setIsRegistered(false)
+      setIsLoading(false)
       return
     }
     try{
@@ -160,7 +159,7 @@ const Signup = ({ navigation }) => {
         setUuid(uuid)
       }catch(e){
         Alert.alert("Error", "El telefono o el correo ya estan registrados")
-        setIsRegistered(false)
+        setIsLoading(false)
         return
       }
 
@@ -190,7 +189,7 @@ const Signup = ({ navigation }) => {
         }catch(e){
           console.log(e.response.data.message)
         }
-        setIsRegistered(false)  
+        setIsLoading(false)  
         return
     } else if (questionnaire.company) {
       setValue("products", products);
@@ -209,7 +208,7 @@ const Signup = ({ navigation }) => {
           console.log(e.response.data.message)
           Alert.alert("Error", e.response.data.message)
         }  
-        setIsRegistered(false)
+        setIsLoading(false)
         return
     }
     await uploadFiles([profID, profTitle, profilePicture], uuid);
@@ -220,7 +219,7 @@ const Signup = ({ navigation }) => {
        '\n espere la confirmacion en su correo',
     )
     await sendEmail(uuid)
-    setIsRegistered(false)
+    setIsLoading(false)
     navigation.goBack()
   };
 
@@ -229,7 +228,7 @@ const Signup = ({ navigation }) => {
   }
 
   const uploadFiles = async (files, uuid) => {
-    setUploading(true);
+    setIsLoading(true)
     console.log(uuid)
      for (let i = 0; i < files.length; i++) {
       await sleep(2)
@@ -248,7 +247,7 @@ const Signup = ({ navigation }) => {
           console.log("RESP ", resp)
         }catch(e){
           console.log(e.response)
-          setIsRegistered(false)
+          setIsLoading(false)
         }
       //formData.append(`documents`, files[i] as any, files[i]?.name + files[i]?.type );
     }
@@ -265,7 +264,7 @@ const Signup = ({ navigation }) => {
         console.log("Response: ", response)
     } catch (error) {
       console.log(error)
-      setIsRegistered(false)
+      setIsLoading(false)
     }
   }
 
@@ -726,6 +725,9 @@ const Signup = ({ navigation }) => {
             filled
             onPress={handleSubmit(handleRegister)}
             style={styles.button}
+            disabled={!isChecked}
+            color={!isChecked? COLORS.greyscale300 : COLORS.primary}
+            isLoading={isLoading}
           />
           {/* <View>
             <OrSeparator text="or continue with" />

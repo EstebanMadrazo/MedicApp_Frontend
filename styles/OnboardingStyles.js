@@ -7,7 +7,8 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         flex: 1,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom:20
     },
     illustration: {
         height: SIZES.width * 0.96,

@@ -46,7 +46,9 @@ export const COLORS = {
     green: '#cdfc78',
     blue: '#69A9DC',
     darkBlue: '#2F55A4',
-    redRose: '#E23F66'
+    redRose: '#E23F66',
+    violet: '#8BA3F9',
+    blue2: '#4A90E2'
 };
 
 export const SIZES = {

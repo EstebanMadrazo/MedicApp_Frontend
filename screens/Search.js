@@ -13,7 +13,7 @@ import estados from '../data/estado.json'
 
 const Search = ({ navigation }) => {
   const refRBSheet = useRef();
-  const [selectedCategories, setSelectedCategories] = useState(["1"]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [states, setStates] = useState([]);
   const [specialities , setSpecialities] = useState([])
   const [medics, setMedics] = useState([])
@@ -82,10 +82,10 @@ const Search = ({ navigation }) => {
           <Text style={[styles.headerTitle, {
             color: COLORS.greyscale900
           }]}>
-            Search
+            Buscar
           </Text>
         </View>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image
             source={icons.moreCircle}
             resizeMode='contain'
@@ -93,7 +93,7 @@ const Search = ({ navigation }) => {
               tintColor: COLORS.greyscale900
             }]}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     )
   }
@@ -120,7 +120,7 @@ const Search = ({ navigation }) => {
             />
           </TouchableOpacity>
           <TextInput
-            placeholder='Search'
+            placeholder='Buscar Médicos'
             placeholderTextColor={COLORS.gray}
             style={[styles.searchInput, {
               color: COLORS.greyscale900

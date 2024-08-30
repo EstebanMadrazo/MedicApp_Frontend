@@ -88,7 +88,7 @@ const Appointment = ({ navigation }) => {
             Mis Citas
           </Text>
         </View>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image
             source={icons.moreCircle}
             resizeMode='contain'
@@ -96,7 +96,7 @@ const Appointment = ({ navigation }) => {
               tintColor: COLORS.greyscale900
             }]}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     )
   }

@@ -10,7 +10,7 @@ import { COLORS, images } from '../constants';
 const Onboarding2 = ({ navigation }) => {
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const intervalId = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress >= 1) {
@@ -30,7 +30,7 @@ const Onboarding2 = ({ navigation }) => {
       navigation.navigate('Onboarding3')
     }
   }, [progress, navigation]);
-
+ */
   return (
     <SafeAreaView style={Onboarding1Styles.container}>
       <PageContainer>
@@ -47,25 +47,25 @@ const Onboarding2 = ({ navigation }) => {
           />
           <View style={Onboarding1Styles.buttonContainer}>
             <View style={Onboarding1Styles.titleContainer}>
-              <Text style={Onboarding1Styles.title}>Find Your Perfect</Text>
-              <Text style={Onboarding1Styles.subTitle}>MEDICAL CARE</Text>
+              <Text style={Onboarding1Styles.title}>Encuentra tu</Text>
+              <Text style={Onboarding1Styles.subTitle}>MÉDICO PREFERIDO</Text>
             </View>
 
             <Text style={Onboarding1Styles.description}>
-              We simplify the process of finding the ideal medical care or specialist in the healthcare industry.
+              Simplificamos la manera en la que puedes encontrar al especialista médico de tu conveniencia.
             </Text>
 
             <View style={Onboarding1Styles.dotsContainer}>
               {progress < 1 && <DotsView progress={progress} numDots={4} />}
             </View>
             <Button
-              title="Next"
+              title="Siguiente"
               filled
-              onPress={() => navigation.navigate('Onboarding2')}
+              onPress={() => navigation.navigate('Onboarding3')}
               style={Onboarding1Styles.nextButton}
             />
             <Button
-              title="Skip"
+              title="Saltar"
               onPress={() => navigation.navigate('Login')}
               textColor={COLORS.primary}
               style={Onboarding1Styles.skipButton}

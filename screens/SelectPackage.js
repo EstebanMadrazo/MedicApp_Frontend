@@ -167,7 +167,7 @@ const SelectPackage = ({ route, navigation }) => {
                 <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Selecciona el tipo de cita</Text>
                 <View style={{
                     backgroundColor: COLORS.tertiaryWhite,
-                    paddingTop: 12
+                    paddingTop: 12,
                 }}>
                     {/* <PackageItem
                         checked={selectedItem === 'Messaging'} // Check if it's the selected item
@@ -191,18 +191,18 @@ const SelectPackage = ({ route, navigation }) => {
                         checked={selectedItem === 'Video call'}
                         onPress={() => handleCheckboxPress('Video call')}
                         title="Video llamada"
-                        subtitle="Video llamada con el médico"
+                        subtitle="Cita por Video Llamada"
                         price={medicInfo.price}
-                        duration={medicInfo.duration.split(" ")[0] +" (Hrs:Min)"}
+                        duration={medicInfo.duration.split(" ")[0] +"\n(Hrs:Min)"}
                         icon={icons.videoCamera}
                     />
                     <PackageItem
                         checked={selectedItem === 'In Person'}
                         onPress={() => handleCheckboxPress('In Person')}
                         title="En persona"
-                        subtitle="Cita presencial con el médico"
+                        subtitle="Cita presencial"
                         price={medicInfo.price}
-                        duration={medicInfo.duration.split(" ")[0] +" (Hrs:Min)"}
+                        duration={medicInfo.duration.split(" ")[0] +"\n(Hrs:Min)"}
                         icon={icons.user}
                     />
                 </View>
