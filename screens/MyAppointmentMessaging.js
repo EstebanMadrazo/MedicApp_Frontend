@@ -190,7 +190,7 @@ const MyAppointmentMessaging = ({ navigation }) => {
         <Text style={[styles.subtitle, {
           color: COLORS.greyscale900
         }]}>Tipo de Cita</Text>
-        <View style={{ backgroundColor: COLORS.tertiaryWhite }}>
+        <View style={{ backgroundColor: COLORS.tertiaryWhite, marginBottom:50 }}>
           <View style={[styles.pkgContainer, {
             backgroundColor: COLORS.white
           }]}>
@@ -205,10 +205,10 @@ const MyAppointmentMessaging = ({ navigation }) => {
               <View>
                 <Text style={[styles.pkgTitle, {
                   color: COLORS.greyscale900
-                }]}>{externalPatient ? "Cita Externa" : "Cita Presencial"}</Text>
+                }]}>{externalPatient ? "Cita Externa" : appointmentInfo.appointment.is_videocall == 1? "Cita virtual" : "Cita Presencial"}</Text>
                 <Text style={[styles.pkgDescription, {
                   color: COLORS.greyScale800
-                }]}>{externalPatient ? "Cita agendada fuera de PREMED" :"Cita presencial con el paciente"}</Text>
+                }]}>{externalPatient ? "Cita agendada fuera de PREMED" : appointmentInfo.appointment.is_videocall == 1? "Cita virtual con el paciente" : "Cita presencial con el paciente"}</Text>
               </View>
             </View>
             <View style={styles.pkgRightContainer}>

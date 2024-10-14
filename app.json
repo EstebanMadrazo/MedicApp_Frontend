@@ -22,7 +22,8 @@
         "foregroundImage": "./assets/images/premed/icon-premed-android.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.greenfieldteam.premed"
+      "package": "com.greenfieldteam.premed",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

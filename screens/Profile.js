@@ -77,7 +77,7 @@ const Profile = ({ navigation }) => {
       <TouchableOpacity style={styles.headerContainer}>
         <View style={styles.headerLeft}>
           <Image
-            source={images.logo}
+            source={images.premedLogo}
             resizeMode='contain'
             style={styles.logo}
           />
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   logo: {
     height: 32,
     width: 32,
-    tintColor: COLORS.primary
+    //tintColor: COLORS.primary
   },
   headerTitle: {
     fontSize: 22,

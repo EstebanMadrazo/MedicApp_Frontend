@@ -195,9 +195,10 @@ const UpcomingBooking = () => {
               <TouchableOpacity
                 onPress={() => navigation.navigate({
                   name:
-                    item.appointment.is_video_call == true ?
+                  "MyAppointmentMessaging",
+                    /* item.appointment.is_video_call == true ?
                       "MyAppointmentVideocall" :
-                      "MyAppointmentMessaging",
+                      "MyAppointmentMessaging", */
                   params: {
                     appointmentInfo: item, // or any other parameter you want to pass
                     externalPatient: item.appointment.external_patient
@@ -229,7 +230,7 @@ const UpcomingBooking = () => {
                     <View style={styles.priceContainer}>
                       <Text style={[styles.address, {
                         color: COLORS.grayscale700,
-                      }]}>{item.appointment.is_video_call === 1 ? "Virtual" : "Presencial"} - </Text>
+                      }]}>{item.appointment.is_videocall === 1 ? "Virtual" : "Presencial"} - </Text>
                       <View style={styles.statusContainer}>
                         <Text style={styles.statusText}>{item.appointment.is_verified == 1 ? "Pagada" : "No pagada"}</Text>
                       </View>
@@ -243,9 +244,10 @@ const UpcomingBooking = () => {
                   onPress={() =>
                     navigation.navigate({
                       name:
-                        item.appointment.is_video_call == true ?
+                        "MyAppointmentMessaging",
+                        /* item.appointment.is_video_call == true ?
                           "MyAppointmentVideoCall"
-                          : "MyAppointmentMessaging",
+                          : "MyAppointmentMessaging", */
                       params: {
                         appointmentInfo: item, // or any other parameter you want to pass
                         externalPatient: item.appointment.external_patient

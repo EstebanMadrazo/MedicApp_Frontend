@@ -40,7 +40,7 @@ Notifications.setNotificationHandler({
   }),
   handleSuccess: () => {
     // dismiss notification immediately after it is presented
-    Notifications.getPresentedNotificationsAsync();
+    //Notifications.getPresentedNotificationsAsync();
   },
 });
 
@@ -134,7 +134,7 @@ const Login = ({ navigation }) => {
       console.log(response);
       // DISMISS ALL NOTIFICATION AFTER INTERACTION
       Notifications.dismissAllNotificationsAsync();
-      redirect(response.notification);
+      //redirect(response.notification);
     });    
 
     return () => {

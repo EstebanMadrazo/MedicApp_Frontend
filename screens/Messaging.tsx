@@ -114,7 +114,7 @@ const Messaging = ({ route, navigation }) => {
 
   useEffect(()=> {
 
-    /* Notifications.setNotificationHandler({
+    Notifications.setNotificationHandler({
       handleNotification: async () => ({
         shouldShowAlert: false,
         shouldPlaySound: false,
@@ -124,7 +124,7 @@ const Messaging = ({ route, navigation }) => {
         // dismiss notification immediately after it is presented
         Notifications.dismissAllNotificationsAsync();
       },
-    }); */
+    });
 
     const messageHandle = (data: any) => {
       console.log("Entre a messageHandle")
@@ -177,7 +177,7 @@ const Messaging = ({ route, navigation }) => {
               color: COLORS.greyscale900
             }]}>{appointmentInfo.info.given_name}</Text>
           </View>
-          <View style={{ flexDirection: "row", alignItems: 'center' }}>
+          {/* <View style={{ flexDirection: "row", alignItems: 'center' }}>
             <TouchableOpacity>
               <Image
                 source={icons.call}
@@ -187,7 +187,7 @@ const Messaging = ({ route, navigation }) => {
                 }]}
               />
             </TouchableOpacity>
-            {/* <TouchableOpacity style={{ marginLeft: 16 }}>
+            <TouchableOpacity style={{ marginLeft: 16 }}>
               <Image
                 source={icons.moreCircle}
                 resizeMode="contain"
@@ -195,8 +195,8 @@ const Messaging = ({ route, navigation }) => {
                   tintColor: COLORS.greyscale900
                 }]}
               />
-            </TouchableOpacity> */}
-          </View>
+            </TouchableOpacity>
+          </View> */}
         </View>
         <View style={[styles.chatContainer]}>
           <GiftedChat

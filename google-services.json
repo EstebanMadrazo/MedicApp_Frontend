@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "217704961913",
+    "project_id": "premed-2",
+    "storage_bucket": "premed-2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217704961913:android:9290a5e7e54b3bb88fc1a8",
+        "android_client_info": {
+          "package_name": "com.greenfieldteam.premed"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEANgWSDXRkzS67SUI9NdTVEi4iwAh7LU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
